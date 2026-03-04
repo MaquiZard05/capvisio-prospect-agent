@@ -14,8 +14,10 @@ MODEL_EXTRACT_FALLBACK = "gemini-2.5-flash-lite"  # Fallback si quota flash épu
 MODEL_SCORE = "gemini-2.5-flash-lite"       # Rapide et économique pour le scoring
 MODEL_MESSAGE = "gemini-2.5-flash-lite"     # Idem pour les messages
 
-LLM_MAX_TOKENS = 2000
-LLM_SLEEP = 13  # Pause entre appels (free tier = 5 req/min par modèle)
+LLM_MAX_TOKENS = 4000
+LLM_SLEEP = 15  # Pause entre appels (free tier = 5 req/min par modèle)
+BATCH_SIZE_EXTRACT = 10  # Résultats par batch d'extraction (réduit le nb d'appels API)
+BATCH_SIZE_SCORE = 10  # Prospects par batch de scoring
 
 # --- Recherche ---
 DEFAULT_GEO_ZONES = ["Nantes", "Rennes", "Bretagne", "Paris", "Île-de-France"]

@@ -5,7 +5,7 @@ import time
 from google import genai
 from src.config import (
     GOOGLE_API_KEY, MODEL_EXTRACT, MODEL_EXTRACT_FALLBACK, LLM_MAX_TOKENS, LLM_SLEEP,
-    CAPVISIO_DESCRIPTION, PROMPT_EXTRACT_BATCH,
+    BATCH_SIZE_EXTRACT, CAPVISIO_DESCRIPTION, PROMPT_EXTRACT_BATCH,
 )
 
 # Bascule automatique si le modèle principal est épuisé
@@ -14,7 +14,7 @@ _active_model = MODEL_EXTRACT
 client = genai.Client(api_key=GOOGLE_API_KEY)
 
 
-def _call_llm(prompt: str, max_retries: int = 2) -> str:
+def _call_llm(prompt: str, max_retries: int = 3) -> str:
     """Appel LLM avec retry sur 429 + fallback modèle."""
     global _active_model
     for attempt in range(max_retries + 1):
@@ -40,8 +40,14 @@ def _call_llm(prompt: str, max_retries: int = 2) -> str:
                     _active_model = MODEL_EXTRACT_FALLBACK
                     continue
                 if attempt < max_retries:
-                    print(f"   [EXTRACT] Rate limit 429 — pause 15s (tentative {attempt+1}/{max_retries})")
-                    time.sleep(15)
+                    # Extraire le retry delay si disponible
+                    wait = 20 + attempt * 10
+                    import re
+                    m = re.search(r"retryDelay.*?(\d+)", error_str)
+                    if m:
+                        wait = int(m.group(1)) + 2
+                    print(f"   [EXTRACT] Rate limit 429 — pause {wait}s (tentative {attempt+1}/{max_retries})")
+                    time.sleep(wait)
                 else:
                     print(f"   [EXTRACT] Rate limit 429 épuisé après {max_retries+1} tentatives")
                     return ""
@@ -108,7 +114,7 @@ def extract_prospects(
     search_results: list[dict],
     existing_prospects: list[dict] | None = None,
     progress_callback=None,
-    batch_size: int = 5,
+    batch_size: int = BATCH_SIZE_EXTRACT,
 ) -> list[dict]:
     """Extrait les prospects par batch. Skip ceux déjà extraits."""
     # Récupérer les entreprises déjà connues

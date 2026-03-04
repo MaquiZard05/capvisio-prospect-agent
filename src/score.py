@@ -5,13 +5,13 @@ import time
 from google import genai
 from src.config import (
     GOOGLE_API_KEY, MODEL_SCORE, LLM_MAX_TOKENS, LLM_SLEEP,
-    CAPVISIO_DESCRIPTION, SCORE_THRESHOLD, PROMPT_SCORE_BATCH,
+    BATCH_SIZE_SCORE, CAPVISIO_DESCRIPTION, SCORE_THRESHOLD, PROMPT_SCORE_BATCH,
 )
 
 client = genai.Client(api_key=GOOGLE_API_KEY)
 
 
-def _call_llm(prompt: str, max_retries: int = 2) -> str:
+def _call_llm(prompt: str, max_retries: int = 3) -> str:
     for attempt in range(max_retries + 1):
         try:
             print(f"   [SCORE] Appel LLM ({MODEL_SCORE}), tentative {attempt+1}/{max_retries+1}")
@@ -27,9 +27,15 @@ def _call_llm(prompt: str, max_retries: int = 2) -> str:
             print(f"   [SCORE] Réponse reçue ({len(text)} chars)")
             return text
         except Exception as e:
-            if "429" in str(e) and attempt < max_retries:
-                print(f"   [SCORE] Rate limit 429 — pause 15s (tentative {attempt+1}/{max_retries})")
-                time.sleep(15)
+            error_str = str(e)
+            if "429" in error_str and attempt < max_retries:
+                import re
+                wait = 20 + attempt * 10
+                m = re.search(r"retryDelay.*?(\d+)", error_str)
+                if m:
+                    wait = int(m.group(1)) + 2
+                print(f"   [SCORE] Rate limit 429 — pause {wait}s (tentative {attempt+1}/{max_retries})")
+                time.sleep(wait)
             else:
                 print(f"   [SCORE] Erreur LLM: {e}")
                 return ""
@@ -66,7 +72,7 @@ def _parse_json(text: str) -> list | None:
     return None
 
 
-def score_prospects(prospects: list[dict], progress_callback=None, batch_size: int = 5) -> list[dict]:
+def score_prospects(prospects: list[dict], progress_callback=None, batch_size: int = BATCH_SIZE_SCORE) -> list[dict]:
     """Score les prospects par batch. Skip ceux déjà scorés."""
     # Séparer : déjà scorés vs à scorer
     to_score = [p for p in prospects if not p.get("_scored")]

@@ -1,0 +1,380 @@
+{
+  "last_search": "2026-03-04T14:30:00",
+  "last_step": "complete",
+  "search_params": {
+    "signal_types": ["demenagement", "construction", "levee_fonds", "recrutement", "renovation"],
+    "geo_zones": ["Nantes", "Rennes", "Paris", "Île-de-France"],
+    "max_results_per_query": 5
+  },
+  "prospects": [
+    {
+      "company_name": "Samsic",
+      "signal_type": "construction",
+      "location": "Rennes, Ille-et-Vilaine",
+      "project_details": "Construction du nouveau siège social de 10 000 m² dans le quartier EuroRennes pour 750 collaborateurs. Première pierre posée en juillet 2025, livraison fin 2027. Le programme Bleriot Feval comprend 27 000 m² au total incluant bureaux, hôtel 4 étoiles et restaurant panoramique.",
+      "estimated_date": "2027-12",
+      "source_url": "https://www.bretagne-economique.com/actualites/lancement-du-chantier-du-nouveau-siege-de-samsic-10-000-m2-au-coeur-deurorennes/",
+      "source_title": "Samsic : lancement du chantier du nouveau siège de 10 000 m² à EuroRennes",
+      "confidence": 0.95,
+      "_extracted": true,
+      "_scored": true,
+      "_messaged": true,
+      "_enriched": true,
+      "company_data": {
+        "siren": "330397200",
+        "nom_complet": "Groupe Samsic",
+        "siege": "Rennes",
+        "secteur": "Services aux entreprises (propreté, sécurité, facility management)",
+        "effectifs": "93 000",
+        "chiffre_affaires": "4 milliards €",
+        "dirigeants": ["Christian Roulleau (Président fondateur)"],
+        "source": "pappers"
+      },
+      "score": 92,
+      "score_breakdown": {
+        "pertinence": 28,
+        "deal_size": 20,
+        "urgence": 20,
+        "geo": 15,
+        "signal_quality": 9
+      },
+      "deal_estimate": "200-500",
+      "approach_angle": "Siège flambant neuf de 10 000 m² pour 750 personnes = dizaines de salles de réunion à équiper. Proposer un accompagnement dès la phase conception avec architectes et MOE pour intégrer visio, affichage dynamique et GTC/GTB dans le smart building.",
+      "priority": "hot",
+      "qualified": true,
+      "messages": {
+        "email_subject": "Votre futur siège EuroRennes — espaces connectés",
+        "email_body": "Bonjour,\n\nFélicitations pour le lancement du chantier de votre nouveau siège à EuroRennes. Un projet de cette envergure — 10 000 m² pour 750 collaborateurs — est une formidable opportunité de repenser vos espaces de travail.\n\nChez CapVisio, nous accompagnons les entreprises dans la conception de leurs espaces connectés : salles de visioconférence, audiovisuel professionnel, affichage dynamique et bâtiment intelligent. Nous avons équipé plus de 7 000 espaces pour 900 clients en France.\n\nIntervenir dès la phase de conception avec vos architectes nous permet d'optimiser chaque salle et de garantir une intégration parfaite. Je vous propose un échange de 15 minutes pour vous présenter nos réalisations sur des projets similaires.\n\nÊtes-vous disponible la semaine prochaine ?\n\nÀ très vite,\nMarc Dupont — CapVisio, Intégrateur Smart Workplace",
+        "whatsapp": "Bonjour, félicitations pour le nouveau siège Samsic à EuroRennes ! 10 000 m² de bureaux neufs, c'est le moment idéal pour intégrer des espaces de réunion connectés dès la conception. Chez CapVisio, c'est notre spécialité — 7 000 espaces installés en France. Un café pour en discuter ?"
+      }
+    },
+    {
+      "company_name": "Doctolib",
+      "signal_type": "demenagement",
+      "location": "Nantes, Loire-Atlantique",
+      "project_details": "Inauguration du nouveau campus régional de 7 800 m² sur l'Île de Nantes (Quartier de la Création). Deux bâtiments (R+4 et R+8) accueillant 400 collaborateurs actuellement, avec une capacité de 750 personnes. Le campus comprend un restaurant d'entreprise, deux grandes salles polyvalentes, une salle de sport et des terrasses.",
+      "estimated_date": "2025-09",
+      "source_url": "https://france3-regions.franceinfo.fr/pays-de-la-loire/loire-atlantique/nantes/doctolib-annonce-l-ouverture-d-un-campus-sur-l-ile-de-nantes-pour-ses-750-futurs-salaries-2536576.html",
+      "source_title": "Doctolib inaugure son campus nantais pour 750 salariés sur l'Île de Nantes",
+      "confidence": 0.98,
+      "_extracted": true,
+      "_scored": true,
+      "_messaged": true,
+      "_enriched": true,
+      "company_data": {
+        "siren": "794465926",
+        "nom_complet": "Doctolib",
+        "siege": "Levallois-Perret",
+        "secteur": "HealthTech / E-santé",
+        "effectifs": "3 000+",
+        "chiffre_affaires": "Non disponible (non coté)",
+        "dirigeants": ["Stanislas Niox-Chateau (CEO)", "Ivan Googuen (CTO)"],
+        "source": "pappers"
+      },
+      "score": 89,
+      "score_breakdown": {
+        "pertinence": 27,
+        "deal_size": 18,
+        "urgence": 22,
+        "geo": 15,
+        "signal_quality": 7
+      },
+      "deal_estimate": "150-400",
+      "approach_angle": "Campus tech de 7 800 m² avec équipes distribuées France entière = besoin critique de visioconférence haute qualité dans chaque salle. Proposer un audit des espaces de réunion et des salles polyvalentes pour équipement Teams Rooms ou Zoom Rooms.",
+      "priority": "hot",
+      "qualified": true,
+      "messages": {
+        "email_subject": "Campus Doctolib Nantes — vos salles de réunion",
+        "email_body": "Bonjour,\n\nJ'ai appris que Doctolib vient d'inaugurer son nouveau campus sur l'Île de Nantes. Avec 750 collaborateurs répartis entre Nantes, Paris et d'autres sites, la qualité de vos outils de collaboration à distance est essentielle.\n\nCapVisio est le 3ème intégrateur visioconférence en France. Nous concevons et installons des espaces de réunion connectés — Microsoft Teams Rooms, Zoom Rooms, audiovisuel professionnel — pour des entreprises tech comme la vôtre. Plus de 7 000 salles équipées à ce jour.\n\nJe vous propose un audit gratuit de vos nouveaux espaces pour identifier les solutions les plus adaptées à votre usage. 15 minutes suffisent pour un premier échange.\n\nÀ très vite,\nMarc Dupont — CapVisio, Intégrateur Smart Workplace",
+        "whatsapp": "Bonjour, félicitations pour votre nouveau campus nantais ! Avec des équipes distribuées sur toute la France, la visio est clé. Chez CapVisio, on équipe les plus beaux campus en salles connectées — Teams Rooms, Zoom Rooms, audiovisuel. Un échange de 15 min pour vous montrer ce qu'on fait ?"
+      }
+    },
+    {
+      "company_name": "Crédit Agricole Atlantique Vendée",
+      "signal_type": "construction",
+      "location": "Nantes, Loire-Atlantique",
+      "project_details": "Nouveau campus « Campus by CA » de 45 000 m² dans le quartier de la Beaujoire à Nantes. Le site accueille 1 300 collaborateurs et vise à accompagner les entreprises dans leur transition digitale. Le campus est désormais opérationnel et constitue l'un des plus grands sites tertiaires de Nantes.",
+      "estimated_date": "2025-06",
+      "source_url": "https://www.lejournaldesentreprises.com/article/le-credit-agricole-atlantique-vendee-inaugure-un-nouveau-modele-avec-le-campus-ca-2042324",
+      "source_title": "Le Crédit Agricole Atlantique Vendée inaugure son Campus de 45 000 m²",
+      "confidence": 0.95,
+      "_extracted": true,
+      "_scored": true,
+      "_messaged": true,
+      "_enriched": true,
+      "company_data": {
+        "siren": "440676890",
+        "nom_complet": "Crédit Agricole Atlantique Vendée",
+        "siege": "Nantes",
+        "secteur": "Banque / Services financiers",
+        "effectifs": "3 200",
+        "chiffre_affaires": "Non disponible",
+        "dirigeants": ["Laurent Heurtaux (Directeur Général)"],
+        "source": "pappers"
+      },
+      "score": 88,
+      "score_breakdown": {
+        "pertinence": 26,
+        "deal_size": 20,
+        "urgence": 20,
+        "geo": 15,
+        "signal_quality": 7
+      },
+      "deal_estimate": "300-800",
+      "approach_angle": "Campus bancaire de 45 000 m² = un des plus grands projets tertiaires de Nantes. Les banques investissent massivement en visioconférence (réunions clients, inter-agences) et en smart building. Proposer une solution complète : salles de réunion, auditorium, affichage dynamique, GTC.",
+      "priority": "hot",
+      "qualified": true,
+      "messages": {
+        "email_subject": "Campus by CA — espaces de réunion nouvelle génération",
+        "email_body": "Bonjour,\n\nJ'ai appris que le Crédit Agricole Atlantique Vendée a inauguré son nouveau Campus de 45 000 m² à la Beaujoire. Un projet ambitieux qui place l'innovation au cœur de votre stratégie.\n\nChez CapVisio, nous accompagnons les grands campus tertiaires dans l'équipement de leurs espaces connectés : salles de visioconférence pour les réunions inter-agences, audiovisuel pour les auditoriums, affichage dynamique et solutions de bâtiment intelligent. Basés à Nantes, nous avons une connaissance fine du tissu économique local.\n\nJe serais ravi de vous proposer un audit gratuit de vos espaces de réunion pour identifier les axes d'amélioration. Seriez-vous disponible pour un échange de 15 minutes ?\n\nBelle journée,\nMarc Dupont — CapVisio, Intégrateur Smart Workplace",
+        "whatsapp": "Bonjour, félicitations pour le Campus by CA à la Beaujoire ! 45 000 m² pour 1 300 collaborateurs, c'est impressionnant. Chez CapVisio à Nantes, on accompagne les grands campus dans l'équipement de leurs salles connectées. Un café pour en discuter ?"
+      }
+    },
+    {
+      "company_name": "L'Orange Bleue",
+      "signal_type": "construction",
+      "location": "Rennes, Ille-et-Vilaine",
+      "project_details": "Construction d'un nouveau siège social de 4 400 m² sur 4 étages dans la ZAC des Chevrons à Rennes. Investissement de 15 millions d'euros. Livraison fin 2025, emménagement prévu en juin 2026. Le bâtiment comprend un studio de production vidéo et un espace podcast. L'entreprise est le leader français du fitness avec 400 salles, 400 000 adhérents et 1 200 collaborateurs dont 210 au siège.",
+      "estimated_date": "2026-06",
+      "source_url": "https://www.lejournaldesentreprises.com/article/lorange-bleue-lance-la-construction-de-son-nouveau-siege-social-rennes-2115945",
+      "source_title": "L'Orange Bleue lance la construction de son nouveau siège à Rennes",
+      "confidence": 0.97,
+      "_extracted": true,
+      "_scored": true,
+      "_messaged": true,
+      "_enriched": true,
+      "company_data": {
+        "siren": "443900594",
+        "nom_complet": "L'Orange Bleue",
+        "siege": "Rennes",
+        "secteur": "Fitness / Franchise",
+        "effectifs": "1 200",
+        "chiffre_affaires": "160 millions €",
+        "dirigeants": ["Thierry Marquer (Président fondateur)"],
+        "source": "pappers"
+      },
+      "score": 91,
+      "score_breakdown": {
+        "pertinence": 30,
+        "deal_size": 17,
+        "urgence": 22,
+        "geo": 15,
+        "signal_quality": 7
+      },
+      "deal_estimate": "100-250",
+      "approach_angle": "Le nouveau siège inclut explicitement un studio de production vidéo et un espace podcast — besoin direct d'équipement audiovisuel professionnel. Proposer une solution complète : studio vidéo (éclairage, caméras, fond vert), studio podcast (traitement acoustique, micros), plus les salles de réunion classiques.",
+      "priority": "hot",
+      "qualified": true,
+      "messages": {
+        "email_subject": "Votre studio vidéo et podcast — on en parle ?",
+        "email_body": "Bonjour,\n\nJ'ai appris que L'Orange Bleue construit son nouveau siège à Rennes avec un studio de production vidéo et un espace podcast intégrés. C'est exactement notre domaine d'expertise.\n\nCapVisio conçoit et installe des espaces audiovisuels professionnels : studios de captation vidéo, espaces podcast avec traitement acoustique, salles de réunion connectées. Nous accompagnons nos clients de la conception technique à l'installation, en partenariat avec les plus grandes marques (Barco, Samsung, Shure, Q-SYS).\n\nAvec un emménagement prévu en juin 2026, c'est le moment idéal pour intégrer l'audiovisuel dans les plans. Je vous propose un échange pour vous présenter nos réalisations.\n\nÀ très vite,\nMarc Dupont — CapVisio, Intégrateur Smart Workplace",
+        "whatsapp": "Bonjour, j'ai vu que votre nouveau siège à Rennes intègre un studio vidéo et un espace podcast — c'est exactement ce qu'on fait chez CapVisio ! On conçoit et installe des studios pro et des salles connectées. Un échange de 15 min pour vous montrer nos réalisations ?"
+      }
+    },
+    {
+      "company_name": "Espacil Habitat",
+      "signal_type": "demenagement",
+      "location": "Rennes, Ille-et-Vilaine",
+      "project_details": "Inauguration du nouveau siège social le 1er juillet 2025 dans une tour de 17 étages (projet Odacite) à Maurepas/Le Pierrefonds. 6 000 m² de bureaux pour 250 collaborateurs. Investissement total du projet : 44 millions d'euros. Déménagement depuis le quartier de la Bellangerais.",
+      "estimated_date": "2025-07",
+      "source_url": "https://www.lejournaldesentreprises.com/breve/espacil-inaugure-son-nouveau-siege-social-rennes-sur-6-000-m2-2123231",
+      "source_title": "Espacil inaugure son nouveau siège social à Rennes sur 6 000 m²",
+      "confidence": 0.93,
+      "_extracted": true,
+      "_scored": true,
+      "_messaged": true,
+      "_enriched": true,
+      "company_data": {
+        "siren": "321387235",
+        "nom_complet": "Espacil Habitat",
+        "siege": "Rennes",
+        "secteur": "Immobilier social / Logement",
+        "effectifs": "250",
+        "chiffre_affaires": "Non disponible",
+        "dirigeants": ["François Rieussec (Directeur Général)"],
+        "source": "pappers"
+      },
+      "score": 82,
+      "score_breakdown": {
+        "pertinence": 24,
+        "deal_size": 15,
+        "urgence": 23,
+        "geo": 15,
+        "signal_quality": 5
+      },
+      "deal_estimate": "80-200",
+      "approach_angle": "Tour de 17 étages = salles de réunion à équiper à chaque niveau. En tant que filiale d'Action Logement, Espacil a des réunions multi-sites régulières. Proposer des solutions de visioconférence standardisées par étage et un audit des besoins AV du nouveau bâtiment.",
+      "priority": "hot",
+      "qualified": true,
+      "messages": {
+        "email_subject": "Nouveau siège Espacil — salles connectées sur 17 étages",
+        "email_body": "Bonjour,\n\nFélicitations pour l'inauguration de votre nouveau siège dans la tour Odacite à Rennes. Un bâtiment de 17 étages pour 250 collaborateurs, c'est une belle étape pour Espacil.\n\nAvec des équipes réparties sur de nombreux niveaux et des échanges réguliers avec le réseau Action Logement, la qualité de vos espaces de réunion et de visioconférence est clé. Chez CapVisio, nous équipons ce type de bâtiments tertiaires depuis plus de 15 ans — salles de réunion connectées, visio Cisco ou Teams Rooms, solutions adaptées à chaque étage.\n\nJe vous propose un audit gratuit de vos espaces. Seriez-vous disponible pour un échange de 15 minutes ?\n\nBelle journée,\nMarc Dupont — CapVisio, Intégrateur Smart Workplace",
+        "whatsapp": "Bonjour, félicitations pour votre nouveau siège dans la tour Odacite ! 17 étages de bureaux neufs, c'est le moment idéal pour bien équiper vos salles de réunion en visio. Chez CapVisio à Rennes, c'est notre spécialité. 15 min pour en discuter ?"
+      }
+    },
+    {
+      "company_name": "Cailabs",
+      "signal_type": "levee_fonds",
+      "location": "Rennes, Ille-et-Vilaine",
+      "project_details": "Levée de 57 millions d'euros (37M€ BEI + 20M€ investisseurs) en 2025. La deeptech spécialisée en photonique prévoit l'extension de son siège de 1 500 m² supplémentaires (actuellement 3 500 m²) et la construction d'une usine de 10 000 m² à Rennes d'ici 2027. L'effectif passera de 150 à 300+ collaborateurs avec ~100 créations de postes.",
+      "estimated_date": "2027-06",
+      "source_url": "https://www.bretagne-economique.com/actualites/french-tech-rennes-saint-malo-plus-de-118-millions-deuros-leves-en-2025-dont-pres-de-la-moitie-par-cailabs/",
+      "source_title": "Cailabs lève 57 millions d'euros pour son expansion à Rennes",
+      "confidence": 0.92,
+      "_extracted": true,
+      "_scored": true,
+      "_messaged": true,
+      "_enriched": true,
+      "company_data": {
+        "siren": "800430817",
+        "nom_complet": "Cailabs",
+        "siege": "Rennes",
+        "secteur": "Deeptech / Photonique / Optique",
+        "effectifs": "150",
+        "chiffre_affaires": "Non disponible",
+        "dirigeants": ["Jean-François Morizur (CEO cofondateur)"],
+        "source": "pappers"
+      },
+      "score": 78,
+      "score_breakdown": {
+        "pertinence": 20,
+        "deal_size": 16,
+        "urgence": 18,
+        "geo": 15,
+        "signal_quality": 9
+      },
+      "deal_estimate": "80-200",
+      "approach_angle": "Deeptech en hypercroissance avec bureaux internationaux (Paris, Washington) = besoin critique de visioconférence pour les échanges R&D intercontinentaux. L'extension du siège de 1 500 m² et la future usine nécessitent des espaces de réunion et de collaboration équipés.",
+      "priority": "hot",
+      "qualified": true,
+      "messages": {
+        "email_subject": "Expansion Cailabs — vos espaces de collaboration",
+        "email_body": "Bonjour,\n\nFélicitations pour cette levée de 57 millions d'euros. L'expansion de Cailabs est impressionnante — doubler vos effectifs et construire une nouvelle usine, c'est un cap majeur.\n\nAvec des équipes à Rennes, Paris et Washington, la qualité de vos outils de visioconférence est critique pour vos échanges R&D. Chez CapVisio, nous équipons les entreprises tech en solutions de collaboration : Cisco Webex, Microsoft Teams Rooms, systèmes audiovisuels haute performance.\n\nVotre extension de 1 500 m² est l'occasion d'intégrer des espaces connectés performants dès la conception. Un échange de 15 minutes pour en parler ?\n\nÀ très vite,\nMarc Dupont — CapVisio, Intégrateur Smart Workplace",
+        "whatsapp": "Bonjour, félicitations pour la levée de 57M€ ! Avec vos équipes à Rennes, Paris et Washington, la visio est au cœur de votre quotidien. Chez CapVisio, on équipe les entreprises tech en salles de réunion connectées. 15 min pour en discuter ?"
+      }
+    },
+    {
+      "company_name": "Pennylane",
+      "signal_type": "levee_fonds",
+      "location": "Paris, Île-de-France",
+      "project_details": "Deux levées de fonds successives : 75 millions d'euros en série D (avril 2025) puis 175 millions d'euros (janvier 2026). Valorisation à 2 milliards d'euros (licorne française). Plan de recrutement massif : 800 collaborateurs visés fin 2025, 12 ingénieurs par mois, 150 développeurs en 2025. 50% de l'effectif en R&D.",
+      "estimated_date": "2026-06",
+      "source_url": "https://www.maddyness.com/2026/01/20/pennylane-nouvelle-levee-de-fonds-de-175-millions-deuros-pour-la-licorne-francaise/",
+      "source_title": "Pennylane lève 175 millions d'euros — la licorne française accélère",
+      "confidence": 0.94,
+      "_extracted": true,
+      "_scored": true,
+      "_messaged": true,
+      "_enriched": true,
+      "company_data": {
+        "siren": "849872023",
+        "nom_complet": "Pennylane",
+        "siege": "Paris",
+        "secteur": "FinTech / Comptabilité",
+        "effectifs": "700+",
+        "chiffre_affaires": "Non disponible",
+        "dirigeants": ["Arthur Waller (CEO cofondateur)", "Felix Music (CTO cofondateur)"],
+        "source": "llm_estimation"
+      },
+      "score": 76,
+      "score_breakdown": {
+        "pertinence": 18,
+        "deal_size": 17,
+        "urgence": 20,
+        "geo": 12,
+        "signal_quality": 9
+      },
+      "deal_estimate": "100-300",
+      "approach_angle": "Licorne en hypercroissance recrutant des centaines de personnes = nouveaux bureaux nécessaires sous 6-12 mois. Entreprise tech-forward qui investira dans des solutions de visio modernes. Approcher via le besoin d'espaces de collaboration pour les équipes R&D distribuées.",
+      "priority": "hot",
+      "qualified": true,
+      "messages": {
+        "email_subject": "Pennylane en hypercroissance — vos futurs espaces",
+        "email_body": "Bonjour,\n\nFélicitations pour cette nouvelle levée de 175 millions d'euros. La croissance de Pennylane est remarquable — atteindre 800 collaborateurs en si peu de temps est un défi logistique autant qu'humain.\n\nQui dit recrutement massif dit nouveaux espaces de travail. Chez CapVisio, nous accompagnons les scale-ups dans l'équipement de leurs bureaux : salles de visioconférence Teams Rooms ou Zoom Rooms, espaces collaboratifs, audiovisuel pour les all-hands. Nos solutions sont pensées pour les entreprises tech en forte croissance.\n\nJe vous propose un échange de 15 minutes pour anticiper vos besoins. Disponible la semaine prochaine ?\n\nÀ très vite,\nMarc Dupont — CapVisio, Intégrateur Smart Workplace",
+        "whatsapp": "Bonjour, félicitations pour les 175M€ levés ! Avec 800 collaborateurs bientôt, vos besoins en salles de réunion connectées vont exploser. Chez CapVisio, on équipe les scale-ups en visio et audiovisuel. 15 min pour en discuter ?"
+      }
+    },
+    {
+      "company_name": "Sekoia.io",
+      "signal_type": "levee_fonds",
+      "location": "Rennes, Ille-et-Vilaine",
+      "project_details": "Levée de 26 millions d'euros en série B (total levé : 60M€ depuis 2022). La pépite de la cybersécurité a inauguré son nouveau siège à Rennes et dispose de bureaux à Paris, Lyon, Bordeaux et en Europe (Oslo, Londres, Barcelone, Francfort, Lisbonne). ARR dépassant les 10M€, objectif 50M€.",
+      "estimated_date": "2025-12",
+      "source_url": "https://www.bretagne-economique.com/actualites/cybersecurite-sekoia-io-leve-26-millions-deuros-en-serie-b/",
+      "source_title": "Sekoia.io lève 26 millions d'euros en série B",
+      "confidence": 0.90,
+      "_extracted": true,
+      "_scored": true,
+      "_messaged": true,
+      "_enriched": true,
+      "company_data": {
+        "siren": "833492854",
+        "nom_complet": "Sekoia.io",
+        "siege": "Rennes",
+        "secteur": "Cybersécurité",
+        "effectifs": "100+",
+        "chiffre_affaires": "ARR > 10M€",
+        "dirigeants": ["David Bizeul (CEO cofondateur)"],
+        "source": "llm_estimation"
+      },
+      "score": 73,
+      "score_breakdown": {
+        "pertinence": 19,
+        "deal_size": 13,
+        "urgence": 19,
+        "geo": 15,
+        "signal_quality": 7
+      },
+      "deal_estimate": "50-150",
+      "approach_angle": "Entreprise multi-sites (8+ bureaux en Europe) avec siège à Rennes = besoin de visioconférence sécurisée et standardisée. La cybersécurité est un secteur sensible où la qualité du chiffrement des communications est un argument clé. Proposer des solutions Cisco Webex certifiées.",
+      "priority": "hot",
+      "qualified": true,
+      "messages": {
+        "email_subject": "Visio sécurisée pour vos 8 bureaux européens",
+        "email_body": "Bonjour,\n\nFélicitations pour cette série B de 26 millions d'euros. La croissance de Sekoia.io confirme l'excellence de la cybersécurité bretonne.\n\nAvec 8 bureaux en Europe, vos équipes collaborent quotidiennement à distance. Dans votre secteur, la sécurité des communications est primordiale. Chez CapVisio, nous déployons des solutions de visioconférence certifiées — Cisco Webex notamment — qui garantissent un chiffrement de bout en bout.\n\nBasés à Rennes comme vous, nous pourrions vous accompagner dans la standardisation de vos espaces de réunion sur l'ensemble de vos sites. Un échange de 15 minutes ?\n\nÀ très vite,\nMarc Dupont — CapVisio, Intégrateur Smart Workplace",
+        "whatsapp": "Bonjour, félicitations pour la série B ! Avec 8 bureaux en Europe, la visio sécurisée est clé pour vos équipes cyber. Chez CapVisio à Rennes, on déploie des solutions Cisco certifiées. Un café pour en discuter ?"
+      }
+    },
+    {
+      "company_name": "Faguo",
+      "signal_type": "demenagement",
+      "location": "Nantes, Loire-Atlantique",
+      "project_details": "Déménagement du siège social de Paris à Nantes, dans des locaux de 1 900 m² au 6 rue Lafayette en centre-ville. La marque de mode responsable installe l'ensemble de ses équipes (direction, création, logistique) dans la métropole nantaise. Inauguration confirmée en 2025.",
+      "estimated_date": "2025-09",
+      "source_url": "https://fr.fashionnetwork.com/news/Faguo-va-installer-son-siege-a-nantes,1096039.html",
+      "source_title": "Faguo installe son siège social à Nantes",
+      "confidence": 0.88,
+      "_extracted": true,
+      "_scored": true,
+      "_messaged": true,
+      "_enriched": true,
+      "company_data": {
+        "siren": "518117139",
+        "nom_complet": "Faguo",
+        "siege": "Nantes",
+        "secteur": "Mode / Textile responsable",
+        "effectifs": "50-80",
+        "chiffre_affaires": "~25 millions €",
+        "dirigeants": ["Frédéric Mugnier (CEO cofondateur)", "Nicolas Rohr (CEO cofondateur)"],
+        "source": "llm_estimation"
+      },
+      "score": 65,
+      "score_breakdown": {
+        "pertinence": 18,
+        "deal_size": 10,
+        "urgence": 20,
+        "geo": 15,
+        "signal_quality": 2
+      },
+      "deal_estimate": "30-80",
+      "approach_angle": "PME qui déménage son siège de Paris à Nantes = refonte complète de l'équipement. Taille modeste mais locaux neufs de 1 900 m². Proposer un équipement complet mais proportionné : 2-3 salles de réunion avec visio, salle de présentation pour les collections.",
+      "priority": "warm",
+      "qualified": true,
+      "messages": {
+        "email_subject": "Bienvenue à Nantes — vos nouveaux espaces",
+        "email_body": "Bonjour,\n\nJ'ai appris que Faguo s'installe à Nantes — bienvenue dans la métropole ! Déménager son siège depuis Paris est une décision forte qui témoigne de votre attachement au territoire.\n\nPour bien démarrer dans vos nouveaux locaux, vos salles de réunion et vos espaces de présentation méritent un équipement à la hauteur de votre marque. Chez CapVisio, basés à Nantes, nous équipons les entreprises en solutions de visioconférence et d'audiovisuel — idéal pour vos échanges avec vos partenaires parisiens et internationaux.\n\nUn café pour en discuter ? Nous sommes voisins maintenant !\n\nÀ très vite,\nMarc Dupont — CapVisio, Intégrateur Smart Workplace",
+        "whatsapp": "Bonjour, bienvenue à Nantes ! J'ai appris que Faguo s'installe rue Lafayette. Chez CapVisio, on est nantais aussi et on équipe les entreprises en salles de réunion connectées. Un café entre voisins pour en discuter ?"
+      }
+    }
+  ]
+}

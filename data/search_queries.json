@@ -1,0 +1,27 @@
+{
+  "demenagement": [
+    "déménagement siège entreprise {geo} {year}",
+    "entreprise déménage bureaux {geo}",
+    "nouveau siège social {geo} {year}"
+  ],
+  "construction": [
+    "permis construire bureaux {geo} {year}",
+    "construction immeuble bureaux {geo}",
+    "projet immobilier tertiaire {geo} {year}"
+  ],
+  "levee_fonds": [
+    "levée de fonds startup {geo} {year}",
+    "levée de fonds entreprise {geo} millions",
+    "financement série {geo} {year}"
+  ],
+  "recrutement": [
+    "recrutement massif entreprise {geo} {year}",
+    "entreprise recrute {geo} postes",
+    "plan embauche {geo} {year}"
+  ],
+  "renovation": [
+    "rénovation bureaux tertiaire {geo} {year}",
+    "aménagement bureaux {geo}",
+    "réhabilitation immeuble bureaux {geo} {year}"
+  ]
+}

@@ -1,0 +1,148 @@
+/* Dark theme CapVisio - Agent Prospecteur */
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+.stApp {
+    background-color: #0F1117;
+    color: #FFFFFF;
+    font-family: 'Source Sans 3', sans-serif;
+}
+
+/* Header */
+.main-header {
+    background: linear-gradient(135deg, #0F1117 0%, #1A1D27 100%);
+    border-bottom: 2px solid #00D4AA;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    border-radius: 0 0 12px 12px;
+}
+
+.main-header h1 {
+    color: #00D4AA;
+    font-weight: 700;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.main-header p {
+    color: #8B8FA3;
+    font-size: 1rem;
+    margin: 0.3rem 0 0 0;
+}
+
+/* Cards */
+.prospect-card {
+    background: #1A1D27;
+    border: 1px solid #2D3140;
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.prospect-card:hover {
+    border-color: #00D4AA;
+    box-shadow: 0 4px 20px rgba(0, 212, 170, 0.1);
+}
+
+/* Score badge */
+.score-badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+}
+
+.score-hot { background: rgba(255, 68, 68, 0.2); color: #FF4444; border: 1px solid #FF4444; }
+.score-warm { background: rgba(255, 165, 0, 0.2); color: #FFA500; border: 1px solid #FFA500; }
+.score-cold { background: rgba(68, 136, 255, 0.2); color: #4488FF; border: 1px solid #4488FF; }
+
+/* Signal badges */
+.signal-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Data text */
+.data-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: #B0B4C8;
+}
+
+/* Metric cards */
+.metric-card {
+    background: #1A1D27;
+    border: 1px solid #2D3140;
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+}
+
+.metric-card .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #00D4AA;
+}
+
+.metric-card .label {
+    color: #8B8FA3;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+/* Message box */
+.message-box {
+    background: #1A1D27;
+    border: 1px solid #2D3140;
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: 'Source Sans 3', sans-serif;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+/* Buttons */
+.stButton > button {
+    background: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
+    color: #0F1117;
+    border: none;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.stButton > button:hover {
+    box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background-color: #0D0F14;
+    border-right: 1px solid #2D3140;
+}
+
+/* Progress bar */
+.stProgress > div > div {
+    background-color: #00D4AA;
+}
+
+/* Tables */
+.stDataFrame {
+    font-family: 'Source Sans 3', sans-serif;
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+    background: #1A1D27;
+    border: 1px solid #2D3140;
+    border-radius: 8px;
+}

@@ -1,7 +1,6 @@
 """Agent Prospecteur CapVisio — Dashboard Streamlit."""
 
 import json
-import time
 from pathlib import Path
 
 import pandas as pd
@@ -17,7 +16,6 @@ from src.config import (
 )
 from src.search import search_signals
 from src.extract import extract_prospects
-from src.enrich import enrich_prospects
 from src.score import score_prospects
 from src.message import generate_messages
 
@@ -50,9 +48,16 @@ def save_prospects(prospects: list[dict]):
 
 
 def load_prospects() -> list[dict]:
-    if DATA_PATH.exists():
-        with open(DATA_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
+    """Charge les prospects depuis le cache JSON."""
+    if not DATA_PATH.exists():
+        return []
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    # Supporte les deux formats : liste directe ou dict avec clé "prospects"
+    if isinstance(data, dict) and "prospects" in data:
+        return data["prospects"]
+    if isinstance(data, list):
+        return data
     return []
 
 
@@ -84,22 +89,22 @@ with st.sidebar:
         default=DEFAULT_GEO_ZONES,
     )
 
-    score_min = st.slider("Score minimum", 0, 100, SCORE_THRESHOLD, step=5)
+    score_min = st.slider("Score minimum", 0, 100, 0, step=5)
 
     st.markdown("---")
     st.markdown("### 📊 Filtres d'affichage")
-    show_all = st.checkbox("Afficher tous les prospects", value=False)
+    show_all = st.checkbox("Afficher tous les prospects", value=True)
     priority_filter = st.multiselect(
         "Priorité",
         options=["hot", "warm", "cold"],
-        default=["hot", "warm"],
+        default=["hot", "warm", "cold"],
         format_func=lambda x: PRIORITY_LABELS.get(x, {}).get("label", x),
     )
 
     st.markdown("---")
 
     # Charger les résultats précédents
-    if st.button("📂 Charger résultats précédents"):
+    if st.button("📂 Charger résultats précédents", use_container_width=True):
         loaded = load_prospects()
         if loaded:
             st.session_state.prospects = loaded
@@ -122,59 +127,60 @@ if launch_search:
 
         with progress_container:
             # Étape 1 : Recherche web
-            st.markdown("### 🔍 Étape 1/5 — Recherche de signaux")
+            st.markdown("### 🔍 Étape 1/4 — Recherche de signaux (Google News)")
             progress_bar = st.progress(0)
             status_text = st.empty()
 
             def search_progress(i, total, query):
                 progress_bar.progress((i + 1) / total)
-                status_text.text(f"Recherche {i+1}/{total} : {query}")
+                status_text.text(f"Recherche {i+1}/{total} : {query[:60]}...")
 
             search_results = search_signals(selected_signals, selected_geo, progress_callback=search_progress)
+            progress_bar.progress(1.0)
             st.success(f"✅ {len(search_results)} résultats trouvés")
 
             # Étape 2 : Extraction
-            st.markdown("### 🧠 Étape 2/5 — Extraction des prospects (LLM)")
+            st.markdown("### 🧠 Étape 2/4 — Extraction des prospects (LLM)")
             progress_bar2 = st.progress(0)
             status_text2 = st.empty()
 
             def extract_progress(i, total):
                 progress_bar2.progress((i + 1) / total)
-                status_text2.text(f"Analyse {i+1}/{total}...")
+                status_text2.text(f"Analyse batch {i+1}/{total}... (pause rate limit entre chaque)")
 
             prospects = extract_prospects(search_results, progress_callback=extract_progress)
+            progress_bar2.progress(1.0)
             st.success(f"✅ {len(prospects)} prospects identifiés")
 
-            # Étape 3 : Enrichissement
-            st.markdown("### 🏢 Étape 3/5 — Enrichissement données entreprise")
-            progress_bar3 = st.progress(0)
+            if prospects:
+                # Étape 3 : Scoring
+                st.markdown("### 📊 Étape 3/4 — Scoring & qualification")
+                progress_bar3 = st.progress(0)
+                status_text3 = st.empty()
 
-            def enrich_progress(i, total):
-                progress_bar3.progress((i + 1) / total)
+                def score_progress(i, total):
+                    progress_bar3.progress((i + 1) / total)
+                    status_text3.text(f"Scoring batch {i+1}/{total}...")
 
-            prospects = enrich_prospects(prospects, progress_callback=enrich_progress)
-            st.success("✅ Enrichissement terminé")
+                prospects = score_prospects(prospects, progress_callback=score_progress)
+                progress_bar3.progress(1.0)
+                qualified = [p for p in prospects if p.get("qualified")]
+                st.success(f"✅ {len(qualified)} prospects qualifiés (score ≥ {SCORE_THRESHOLD})")
 
-            # Étape 4 : Scoring
-            st.markdown("### 📊 Étape 4/5 — Scoring & qualification")
-            progress_bar4 = st.progress(0)
+                # Étape 4 : Messages
+                st.markdown("### ✉️ Étape 4/4 — Génération des messages d'approche")
+                progress_bar4 = st.progress(0)
+                status_text4 = st.empty()
 
-            def score_progress(i, total):
-                progress_bar4.progress((i + 1) / total)
+                def msg_progress(i, total):
+                    progress_bar4.progress((i + 1) / total)
+                    status_text4.text(f"Message {i+1}/{total}...")
 
-            prospects = score_prospects(prospects, progress_callback=score_progress)
-            qualified = [p for p in prospects if p.get("score", 0) >= SCORE_THRESHOLD]
-            st.success(f"✅ {len(qualified)} prospects qualifiés (score ≥ {SCORE_THRESHOLD})")
-
-            # Étape 5 : Messages
-            st.markdown("### ✉️ Étape 5/5 — Génération des messages d'approche")
-            progress_bar5 = st.progress(0)
-
-            def msg_progress(i, total):
-                progress_bar5.progress((i + 1) / total)
-
-            prospects = generate_messages(prospects, progress_callback=msg_progress)
-            st.success("✅ Messages générés")
+                prospects = generate_messages(prospects, progress_callback=msg_progress)
+                progress_bar4.progress(1.0)
+                st.success("✅ Messages générés")
+            else:
+                st.warning("Aucun prospect pertinent détecté. Essayez d'élargir les signaux ou les zones.")
 
         # Sauvegarder
         st.session_state.prospects = prospects
@@ -192,7 +198,7 @@ if st.session_state.search_done and st.session_state.prospects:
             if p.get("score", 0) >= score_min and p.get("priority", "cold") in priority_filter
         ]
     else:
-        filtered = prospects
+        filtered = [p for p in prospects if p.get("priority", "cold") in priority_filter]
 
     # Métriques
     st.markdown("---")
@@ -239,7 +245,6 @@ if st.session_state.search_done and st.session_state.prospects:
     if filtered:
         st.markdown(f"### 📋 Prospects ({len(filtered)} affichés)")
 
-        # DataFrame pour le tableau
         table_data = []
         for p in filtered:
             signal_info = SIGNAL_LABELS.get(p.get("signal_type", ""), {})
@@ -284,24 +289,22 @@ if st.session_state.search_done and st.session_state.prospects:
                 col_info, col_score = st.columns([2, 1])
 
                 with col_info:
-                    st.markdown("#### 🏢 Informations entreprise")
+                    st.markdown("#### 🏢 Informations")
+                    st.markdown(f"**Entreprise** : {company}")
+                    st.markdown(f"**Localisation** : {prospect.get('location', 'N/A')}")
+
+                    # Données enrichies si disponibles
                     company_data = prospect.get("company_data", {})
                     if company_data:
-                        info_items = [
-                            ("Nom complet", company_data.get("nom_complet", company)),
-                            ("SIREN", company_data.get("siren", "N/A")),
-                            ("Siège", company_data.get("siege", prospect.get("location", "N/A"))),
-                            ("Effectifs", company_data.get("effectifs", "N/A")),
-                            ("CA", company_data.get("chiffre_affaires", "N/A")),
-                        ]
-                        for label, value in info_items:
-                            st.markdown(f"**{label}** : `{value}`")
-
+                        if company_data.get("siren"):
+                            st.markdown(f"**SIREN** : `{company_data['siren']}`")
+                        if company_data.get("effectifs"):
+                            st.markdown(f"**Effectifs** : {company_data['effectifs']}")
+                        if company_data.get("chiffre_affaires"):
+                            st.markdown(f"**CA** : {company_data['chiffre_affaires']}")
                         dirigeants = company_data.get("dirigeants", [])
                         if dirigeants:
                             st.markdown(f"**Dirigeants** : {', '.join(dirigeants)}")
-                    else:
-                        st.markdown(f"**Localisation** : {prospect.get('location', 'N/A')}")
 
                     st.markdown("#### 📡 Signal détecté")
                     st.markdown(f"**Type** : {signal_info.get('emoji', '')} {signal_info.get('label', '')}")
@@ -320,76 +323,82 @@ if st.session_state.search_done and st.session_state.prospects:
                         for key, val in breakdown.items():
                             label_map = {
                                 "pertinence": "Pertinence métier",
+                                "pertinence_metier": "Pertinence métier",
                                 "deal_size": "Taille deal",
+                                "taille_deal": "Taille deal",
                                 "urgence": "Urgence",
+                                "urgence_timing": "Urgence",
                                 "geo": "Proximité géo",
+                                "proximite_geo": "Proximité géo",
                                 "signal_quality": "Qualité signal",
+                                "qualite_signal": "Qualité signal",
                             }
                             st.markdown(f"**{label_map.get(key, key)}** : {val}")
 
                     st.markdown(f"**Deal estimé** : {prospect.get('deal_estimate', 'N/A')}")
-                    st.markdown(f"**Angle** : {prospect.get('approach_angle', 'N/A')}")
+                    if prospect.get("approach_angle"):
+                        st.markdown(f"**Angle** : {prospect.get('approach_angle')}")
 
                 # Messages d'approche
                 messages = prospect.get("messages", {})
-                if messages and messages.get("email_body"):
+                if messages and (messages.get("email_body") or messages.get("whatsapp")):
                     st.markdown("---")
                     st.markdown("#### ✉️ Messages d'approche")
 
                     tab_email, tab_whatsapp = st.tabs(["📧 Email", "💬 WhatsApp"])
 
                     with tab_email:
-                        st.markdown(f"**Objet** : {messages.get('email_subject', '')}")
-                        st.markdown(
-                            f"""<div class="message-box">{messages.get('email_body', '')}</div>""",
-                            unsafe_allow_html=True,
-                        )
-                        st.code(
-                            f"Objet: {messages.get('email_subject', '')}\n\n{messages.get('email_body', '')}",
-                            language=None,
-                        )
+                        if messages.get("email_subject"):
+                            st.markdown(f"**Objet** : {messages['email_subject']}")
+                        if messages.get("email_body"):
+                            st.markdown(
+                                f"""<div class="message-box">{messages['email_body']}</div>""",
+                                unsafe_allow_html=True,
+                            )
+                            st.code(
+                                f"Objet: {messages.get('email_subject', '')}\n\n{messages['email_body']}",
+                                language=None,
+                            )
 
                     with tab_whatsapp:
-                        st.markdown(
-                            f"""<div class="message-box">{messages.get('whatsapp', '')}</div>""",
-                            unsafe_allow_html=True,
-                        )
-                        st.code(messages.get("whatsapp", ""), language=None)
+                        if messages.get("whatsapp"):
+                            st.markdown(
+                                f"""<div class="message-box whatsapp">{messages['whatsapp']}</div>""",
+                                unsafe_allow_html=True,
+                            )
+                            st.code(messages["whatsapp"], language=None)
 
         # Export CSV
         st.markdown("---")
-        if st.button("📥 Exporter en CSV"):
-            export_data = []
-            for p in filtered:
-                cd = p.get("company_data", {})
-                msgs = p.get("messages", {})
-                export_data.append({
-                    "Entreprise": p.get("company_name", ""),
-                    "SIREN": cd.get("siren", ""),
-                    "Signal": p.get("signal_type", ""),
-                    "Score": p.get("score", 0),
-                    "Priorité": p.get("priority", ""),
-                    "Localisation": p.get("location", ""),
-                    "Détails": p.get("project_details", ""),
-                    "Date estimée": p.get("estimated_date", ""),
-                    "Deal estimé": p.get("deal_estimate", ""),
-                    "Effectifs": cd.get("effectifs", ""),
-                    "CA": cd.get("chiffre_affaires", ""),
-                    "Angle approche": p.get("approach_angle", ""),
-                    "Email objet": msgs.get("email_subject", ""),
-                    "Email corps": msgs.get("email_body", ""),
-                    "WhatsApp": msgs.get("whatsapp", ""),
-                    "Source URL": p.get("source_url", ""),
-                })
+        export_data = []
+        for p in filtered:
+            cd = p.get("company_data", {})
+            msgs = p.get("messages", {})
+            export_data.append({
+                "Entreprise": p.get("company_name", ""),
+                "Signal": p.get("signal_type", ""),
+                "Score": p.get("score", 0),
+                "Priorité": p.get("priority", ""),
+                "Localisation": p.get("location", ""),
+                "Détails": p.get("project_details", ""),
+                "Date estimée": p.get("estimated_date", ""),
+                "Deal estimé": p.get("deal_estimate", ""),
+                "Angle approche": p.get("approach_angle", ""),
+                "Email objet": msgs.get("email_subject", ""),
+                "Email corps": msgs.get("email_body", ""),
+                "WhatsApp": msgs.get("whatsapp", ""),
+                "Source URL": p.get("source_url", ""),
+            })
 
-            df_export = pd.DataFrame(export_data)
-            csv = df_export.to_csv(index=False, encoding="utf-8-sig")
-            st.download_button(
-                label="⬇️ Télécharger le CSV",
-                data=csv,
-                file_name="prospects_capvisio.csv",
-                mime="text/csv",
-            )
+        df_export = pd.DataFrame(export_data)
+        csv = df_export.to_csv(index=False, encoding="utf-8-sig")
+        st.download_button(
+            label="📥 Exporter en CSV",
+            data=csv,
+            file_name="prospects_capvisio.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
     else:
         st.info("Aucun prospect ne correspond aux filtres sélectionnés.")
 
@@ -400,6 +409,9 @@ elif not st.session_state.search_done:
             <h2>👆 Configurez vos paramètres et lancez une recherche</h2>
             <p>L'agent va détecter automatiquement les signaux d'achat<br>
             et qualifier les prospects pour CapVisio.</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                💡 Ou cliquez sur <b>"Charger résultats précédents"</b> dans la sidebar
+            </p>
         </div>
         """,
         unsafe_allow_html=True,

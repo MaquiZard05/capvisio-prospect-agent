@@ -1,27 +1,35 @@
 {
   "demenagement": [
-    "déménagement siège entreprise {geo} {year}",
-    "entreprise déménage bureaux {geo}",
-    "nouveau siège social {geo} {year}"
+    "\"nouveau siège\" entreprise {geo} {year}",
+    "\"déménagement\" OR \"nouveaux locaux\" entreprise bureaux {geo}",
+    "\"s'installe\" \"nouveaux bureaux\" société {geo} {year}",
+    "\"transfert de siège\" entreprise {geo} {year}",
+    "\"inauguration\" \"nouveaux locaux\" entreprise {geo}"
   ],
   "construction": [
-    "permis construire bureaux {geo} {year}",
-    "construction immeuble bureaux {geo}",
-    "projet immobilier tertiaire {geo} {year}"
+    "\"immeuble de bureaux\" construction livraison {geo} {year}",
+    "\"permis de construire\" bureaux tertiaire {geo} {year}",
+    "\"projet immobilier\" bureaux tertiaire {geo} {year}",
+    "\"campus\" entreprise construction {geo} {year}",
+    "\"parc d'activités\" bureaux {geo} {year}"
   ],
   "levee_fonds": [
-    "levée de fonds startup {geo} {year}",
-    "levée de fonds entreprise {geo} millions",
-    "financement série {geo} {year}"
+    "\"levée de fonds\" \"millions\" startup {geo} {year}",
+    "\"lève\" \"millions d'euros\" startup {geo} {year}",
+    "\"série A\" OR \"série B\" startup {geo} {year}",
+    "\"tour de table\" \"millions\" entreprise {geo} {year}",
+    "\"croissance\" \"financement\" startup {geo} {year}"
   ],
   "recrutement": [
-    "recrutement massif entreprise {geo} {year}",
-    "entreprise recrute {geo} postes",
-    "plan embauche {geo} {year}"
+    "\"recrute\" \"postes\" OR \"collaborateurs\" entreprise {geo} {year}",
+    "\"plan de recrutement\" entreprise {geo} {year}",
+    "\"créations d'emplois\" OR \"embauches\" entreprise {geo} {year}",
+    "\"forte croissance\" recrutement entreprise {geo} {year}"
   ],
   "renovation": [
-    "rénovation bureaux tertiaire {geo} {year}",
-    "aménagement bureaux {geo}",
-    "réhabilitation immeuble bureaux {geo} {year}"
+    "\"rénovation\" \"bureaux\" OR \"siège\" entreprise {geo} {year}",
+    "\"réaménagement\" \"locaux\" entreprise {geo}",
+    "\"travaux\" \"bureaux\" \"rénovation\" entreprise {geo} {year}",
+    "\"smart building\" OR \"bâtiment intelligent\" {geo} {year}"
   ]
 }

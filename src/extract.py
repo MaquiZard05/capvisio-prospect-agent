@@ -1,25 +1,53 @@
-"""Extraction structurée des prospects via LLM Groq."""
+"""Extraction structurée des prospects via LLM Gemini (batching + cache)."""
 
 import json
-from groq import Groq
-from src.config import GROQ_API_KEY, LLM_MODEL, LLM_TEMPERATURE, LLM_MAX_TOKENS, PROMPT_EXTRACT
+import time
+from google import genai
+from src.config import (
+    GOOGLE_API_KEY, MODEL_EXTRACT, MODEL_EXTRACT_FALLBACK, LLM_MAX_TOKENS, LLM_SLEEP,
+    CAPVISIO_DESCRIPTION, PROMPT_EXTRACT_BATCH,
+)
 
-client = Groq(api_key=GROQ_API_KEY)
+# Bascule automatique si le modèle principal est épuisé
+_active_model = MODEL_EXTRACT
 
-
-def _call_llm(prompt: str) -> str:
-    response = client.chat.completions.create(
-        model=LLM_MODEL,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=LLM_TEMPERATURE,
-        max_tokens=LLM_MAX_TOKENS,
-    )
-    return response.choices[0].message.content.strip()
+client = genai.Client(api_key=GOOGLE_API_KEY)
 
 
-def _parse_json(text: str) -> dict | None:
-    """Tente d'extraire un JSON depuis la réponse LLM."""
-    # Cherche un bloc JSON dans la réponse
+def _call_llm(prompt: str, max_retries: int = 2) -> str:
+    """Appel LLM avec retry sur 429 + fallback modèle."""
+    global _active_model
+    for attempt in range(max_retries + 1):
+        try:
+            response = client.models.generate_content(
+                model=_active_model,
+                contents=prompt,
+                config=genai.types.GenerateContentConfig(
+                    temperature=0,
+                    max_output_tokens=LLM_MAX_TOKENS,
+                ),
+            )
+            return response.text.strip()
+        except Exception as e:
+            error_str = str(e)
+            if "429" in error_str:
+                # Si quota journalier épuisé, basculer sur le fallback
+                if "PerDay" in error_str and _active_model != MODEL_EXTRACT_FALLBACK:
+                    print(f"   ⚠️ Quota jour épuisé pour {_active_model}, bascule → {MODEL_EXTRACT_FALLBACK}")
+                    _active_model = MODEL_EXTRACT_FALLBACK
+                    continue
+                if attempt < max_retries:
+                    print(f"   ⏳ Rate limit — pause 15s (tentative {attempt+1}/{max_retries})")
+                    time.sleep(15)
+                else:
+                    raise
+            else:
+                raise
+    return ""
+
+
+def _parse_json(text: str) -> list | dict | None:
+    """Parse le JSON du LLM avec fallback regex."""
     text = text.strip()
     if text.startswith("```"):
         lines = text.split("\n")
@@ -31,70 +59,120 @@ def _parse_json(text: str) -> dict | None:
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        # Tente de trouver le premier { ... }
-        start = text.find("{")
-        end = text.rfind("}") + 1
+        # Chercher un array [...]
+        start = text.find("[")
+        end = text.rfind("]") + 1
         if start >= 0 and end > start:
             try:
                 return json.loads(text[start:end])
             except json.JSONDecodeError:
-                return None
+                pass
+        # Chercher un objet {...}
+        start = text.find("{")
+        end = text.rfind("}") + 1
+        if start >= 0 and end > start:
+            try:
+                result = json.loads(text[start:end])
+                return [result] if isinstance(result, dict) else result
+            except json.JSONDecodeError:
+                pass
     return None
 
 
-def extract_prospect(search_result: dict) -> dict | None:
-    """Extrait un prospect structuré depuis un résultat de recherche brut.
+def _pre_filter(result: dict) -> bool:
+    """Filtre rapide pour éliminer le bruit avant l'appel LLM."""
+    noise_domains = ["wikipedia.org", "wiktionary.org", "larousse.fr", "dictionnaire",
+                     "service-public.fr", "pagesjaunes.fr", "allocine.fr", "senscritique.com",
+                     "indeed.com", "linkedin.com/jobs", "pole-emploi.fr"]
+    url = result.get("url", "").lower()
+    title = result.get("title", "").lower()
 
-    Returns:
-        Dict prospect structuré ou None si non pertinent.
-    """
-    search_text = f"Titre: {search_result['title']}\nURL: {search_result['url']}\nExtrait: {search_result['snippet']}"
-    prompt = PROMPT_EXTRACT.format(search_result=search_text)
+    for domain in noise_domains:
+        if domain in url:
+            return False
 
-    try:
-        response = _call_llm(prompt)
-        data = _parse_json(response)
-    except Exception:
-        return None
+    noise_words = ["définition", "dictionnaire", "conjugaison", "synonyme", "wikipédia", "série tv"]
+    for word in noise_words:
+        if word in title:
+            return False
 
-    if not data or not data.get("relevant", False):
-        return None
-
-    # Enrichir avec les métadonnées de recherche
-    data["source_signal_type"] = search_result.get("signal_type", "")
-    data["source_geo"] = search_result.get("geo_zone", "")
-    data["raw_title"] = search_result.get("title", "")
-    data["raw_snippet"] = search_result.get("snippet", "")
-
-    return data
+    return True
 
 
 def extract_prospects(
     search_results: list[dict],
+    existing_prospects: list[dict] | None = None,
     progress_callback=None,
+    batch_size: int = 5,
 ) -> list[dict]:
-    """Extrait les prospects depuis une liste de résultats de recherche.
-
-    Returns:
-        Liste de prospects structurés (filtrés, dédupliqués par company_name).
-    """
-    prospects = []
+    """Extrait les prospects par batch. Skip ceux déjà extraits."""
+    # Récupérer les entreprises déjà connues
     seen_companies = set()
+    if existing_prospects:
+        for p in existing_prospects:
+            name = p.get("company_name", "").lower().strip()
+            if name:
+                seen_companies.add(name)
 
-    for i, result in enumerate(search_results):
+    # Pré-filtrage du bruit
+    filtered_results = [r for r in search_results if _pre_filter(r)]
+    print(f"   Pré-filtre : {len(search_results)} → {len(filtered_results)} résultats pertinents")
+
+    if not filtered_results:
+        return list(existing_prospects or [])
+
+    prospects = list(existing_prospects or [])
+    total_batches = max(1, (len(filtered_results) + batch_size - 1) // batch_size)
+
+    for batch_idx in range(total_batches):
+        start_i = batch_idx * batch_size
+        end_i = min(start_i + batch_size, len(filtered_results))
+        batch = filtered_results[start_i:end_i]
+
         if progress_callback:
-            progress_callback(i, len(search_results))
+            progress_callback(batch_idx, total_batches)
 
-        prospect = extract_prospect(result)
-        if prospect is None:
-            continue
+        # Formater le batch pour le prompt
+        batch_text = ""
+        for i, r in enumerate(batch, 1):
+            batch_text += f"\n--- Résultat {i} ---\n"
+            batch_text += f"Titre: {r['title']}\n"
+            batch_text += f"URL: {r['url']}\n"
+            batch_text += f"Extrait: {r['snippet']}\n"
 
-        company = prospect.get("company_name", "").lower().strip()
-        if company and company in seen_companies:
-            continue
-        if company:
-            seen_companies.add(company)
+        prompt = PROMPT_EXTRACT_BATCH.format(
+            capvisio_desc=CAPVISIO_DESCRIPTION,
+            search_results_batch=batch_text,
+        )
 
-        prospects.append(prospect)
+        try:
+            response = _call_llm(prompt)
+            extracted = _parse_json(response)
+        except Exception as e:
+            print(f"   ⚠️ Erreur batch {batch_idx+1}: {e}")
+            extracted = None
+
+        if extracted and isinstance(extracted, list):
+            for item in extracted:
+                if not isinstance(item, dict):
+                    continue
+                if not item.get("relevant", True):
+                    continue
+
+                company = item.get("company_name", "").lower().strip()
+                if not company or company in seen_companies:
+                    continue
+                seen_companies.add(company)
+
+                # Métadonnées de recherche
+                item["source_signal_type"] = batch[0].get("signal_type", "")
+                item["source_geo"] = batch[0].get("geo_zone", "")
+                item["_extracted"] = True
+                prospects.append(item)
+
+        # Pause entre les batches
+        if batch_idx < total_batches - 1:
+            print(f"   ⏳ Pause {LLM_SLEEP}s (rate limit)...")
+            time.sleep(LLM_SLEEP)
 
     return prospects

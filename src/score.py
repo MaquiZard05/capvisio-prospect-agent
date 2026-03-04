@@ -1,61 +1,142 @@
-"""Scoring et qualification des prospects via LLM."""
+"""Scoring et qualification des prospects via LLM Gemini (batching + cache)."""
 
 import json
-from groq import Groq
+import time
+from google import genai
 from src.config import (
-    GROQ_API_KEY, LLM_MODEL, LLM_TEMPERATURE, LLM_MAX_TOKENS,
-    PROMPT_SCORE, CAPVISIO_DESCRIPTION, SCORE_THRESHOLD,
+    GOOGLE_API_KEY, MODEL_SCORE, LLM_MAX_TOKENS, LLM_SLEEP,
+    CAPVISIO_DESCRIPTION, SCORE_THRESHOLD, PROMPT_SCORE_BATCH,
 )
 
-client = Groq(api_key=GROQ_API_KEY)
+client = genai.Client(api_key=GOOGLE_API_KEY)
 
 
-def score_prospect(prospect: dict) -> dict:
-    """Score un prospect et ajoute les données de qualification."""
-    prospect_text = json.dumps(prospect, ensure_ascii=False, indent=2)
-    prompt = PROMPT_SCORE.format(
-        prospect_data=prospect_text,
-        capvisio_desc=CAPVISIO_DESCRIPTION,
-    )
+def _call_llm(prompt: str, max_retries: int = 2) -> str:
+    for attempt in range(max_retries + 1):
+        try:
+            response = client.models.generate_content(
+                model=MODEL_SCORE,
+                contents=prompt,
+                config=genai.types.GenerateContentConfig(
+                    temperature=0,
+                    max_output_tokens=LLM_MAX_TOKENS,
+                ),
+            )
+            return response.text.strip()
+        except Exception as e:
+            if "429" in str(e) and attempt < max_retries:
+                print(f"   ⏳ Rate limit — pause 15s (tentative {attempt+1}/{max_retries})")
+                time.sleep(15)
+            else:
+                raise
+    return ""
+
+
+def _parse_json(text: str) -> list | None:
+    text = text.strip()
+    if text.startswith("```"):
+        lines = text.split("\n")
+        text = "\n".join(lines[1:])
+        if text.endswith("```"):
+            text = text[:-3]
+        text = text.strip()
 
     try:
-        response = client.chat.completions.create(
-            model=LLM_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=LLM_TEMPERATURE,
-            max_tokens=LLM_MAX_TOKENS,
-        )
-        text = response.choices[0].message.content.strip()
+        result = json.loads(text)
+        return result if isinstance(result, list) else [result]
+    except json.JSONDecodeError:
+        start = text.find("[")
+        end = text.rfind("]") + 1
+        if start >= 0 and end > start:
+            try:
+                return json.loads(text[start:end])
+            except json.JSONDecodeError:
+                pass
         start = text.find("{")
         end = text.rfind("}") + 1
         if start >= 0 and end > start:
-            scoring = json.loads(text[start:end])
-            prospect["score"] = scoring.get("score", 0)
-            prospect["score_breakdown"] = scoring.get("score_breakdown", {})
-            prospect["deal_estimate"] = scoring.get("deal_estimate", "N/A")
-            prospect["approach_angle"] = scoring.get("approach_angle", "")
-            prospect["priority"] = scoring.get("priority", "cold")
-            prospect["qualified"] = prospect["score"] >= SCORE_THRESHOLD
-            return prospect
-    except Exception:
-        pass
-
-    # Fallback : score neutre
-    prospect["score"] = 0
-    prospect["score_breakdown"] = {}
-    prospect["deal_estimate"] = "N/A"
-    prospect["approach_angle"] = ""
-    prospect["priority"] = "cold"
-    prospect["qualified"] = False
-    return prospect
+            try:
+                return [json.loads(text[start:end])]
+            except json.JSONDecodeError:
+                pass
+    return None
 
 
-def score_prospects(prospects: list[dict], progress_callback=None) -> list[dict]:
-    """Score une liste de prospects et les trie par score décroissant."""
-    for i, prospect in enumerate(prospects):
+def score_prospects(prospects: list[dict], progress_callback=None, batch_size: int = 5) -> list[dict]:
+    """Score les prospects par batch. Skip ceux déjà scorés."""
+    # Séparer : déjà scorés vs à scorer
+    to_score = [p for p in prospects if not p.get("_scored")]
+    already_scored = [p for p in prospects if p.get("_scored")]
+
+    if not to_score:
+        print("   Tous les prospects sont déjà scorés, skip.")
+        prospects.sort(key=lambda p: p.get("score", 0), reverse=True)
+        return prospects
+
+    print(f"   {len(to_score)} à scorer, {len(already_scored)} déjà traités")
+
+    total_batches = max(1, (len(to_score) + batch_size - 1) // batch_size)
+
+    for batch_idx in range(total_batches):
+        start = batch_idx * batch_size
+        end = min(start + batch_size, len(to_score))
+        batch = to_score[start:end]
+
         if progress_callback:
-            progress_callback(i, len(prospects))
-        score_prospect(prospect)
+            progress_callback(batch_idx, total_batches)
+
+        batch_text = json.dumps(
+            [{"company_name": p.get("company_name"), "signal_type": p.get("signal_type"),
+              "location": p.get("location"), "project_details": p.get("project_details")}
+             for p in batch],
+            ensure_ascii=False, indent=2
+        )
+
+        prompt = PROMPT_SCORE_BATCH.format(
+            capvisio_desc=CAPVISIO_DESCRIPTION,
+            prospects_batch=batch_text,
+        )
+
+        try:
+            response = _call_llm(prompt)
+            scored_list = _parse_json(response)
+        except Exception as e:
+            print(f"   ⚠️ Erreur scoring batch {batch_idx+1}: {e}")
+            scored_list = None
+
+        if scored_list:
+            score_map = {s.get("company_name", "").lower().strip(): s for s in scored_list if isinstance(s, dict)}
+            for p in batch:
+                name = p.get("company_name", "").lower().strip()
+                scored = score_map.get(name, {})
+                p["score"] = scored.get("score", 0)
+                breakdown = scored.get("score_breakdown", {})
+                p["score_breakdown"] = {
+                    "pertinence": breakdown.get("pertinence_metier", breakdown.get("pertinence", 0)),
+                    "deal_size": breakdown.get("taille_deal", breakdown.get("deal_size", 0)),
+                    "urgence": breakdown.get("urgence_timing", breakdown.get("urgence", 0)),
+                    "geo": breakdown.get("proximite_geo", breakdown.get("geo", 0)),
+                    "signal_quality": breakdown.get("qualite_signal", breakdown.get("signal_quality", 0)),
+                }
+                p["deal_estimate"] = scored.get("deal_estimate_keur", "N/A")
+                p["approach_angle"] = scored.get("approach_angle", "")
+                p["priority"] = scored.get("priority", "cold")
+                p["qualified"] = p["score"] >= SCORE_THRESHOLD
+                p["_scored"] = True
+        else:
+            for p in batch:
+                p["score"] = 0
+                p["score_breakdown"] = {}
+                p["deal_estimate"] = "N/A"
+                p["approach_angle"] = ""
+                p["priority"] = "cold"
+                p["qualified"] = False
+                p["_scored"] = True
+
+        # Pause entre les batches
+        if batch_idx < total_batches - 1:
+            print(f"   ⏳ Pause {LLM_SLEEP}s (rate limit)...")
+            time.sleep(LLM_SLEEP)
 
     prospects.sort(key=lambda p: p.get("score", 0), reverse=True)
     return prospects

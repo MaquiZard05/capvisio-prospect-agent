@@ -1,16 +1,21 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
 
 # --- API Keys ---
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 PAPPERS_API_KEY = os.getenv("PAPPERS_API_KEY", "")
 
-# --- LLM ---
-LLM_MODEL = "llama-3.1-70b-versatile"
-LLM_TEMPERATURE = 0.3
+# --- LLM Multi-modèle ---
+MODEL_EXTRACT = "gemini-2.5-flash"          # Le plus puissant pour l'extraction
+MODEL_EXTRACT_FALLBACK = "gemini-2.5-flash-lite"  # Fallback si quota flash épuisé
+MODEL_SCORE = "gemini-2.5-flash-lite"       # Rapide et économique pour le scoring
+MODEL_MESSAGE = "gemini-2.5-flash-lite"     # Idem pour les messages
+
 LLM_MAX_TOKENS = 2000
+LLM_SLEEP = 13  # Pause entre appels (free tier = 5 req/min par modèle)
 
 # --- Recherche ---
 DEFAULT_GEO_ZONES = ["Nantes", "Rennes", "Bretagne", "Paris", "Île-de-France"]
@@ -20,6 +25,11 @@ CURRENT_YEAR = "2026"
 
 # --- Scoring ---
 SCORE_THRESHOLD = 60
+
+# --- Chemins fichiers ---
+DATA_DIR = Path(__file__).parent.parent / "data"
+PROSPECTS_FILE = DATA_DIR / "prospects.json"
+QUERIES_FILE = DATA_DIR / "search_queries.json"
 
 # --- CapVisio ---
 CAPVISIO_DESCRIPTION = (
@@ -31,67 +41,98 @@ CAPVISIO_DESCRIPTION = (
 )
 
 # --- Prompts LLM ---
-PROMPT_EXTRACT = """Tu es un analyste commercial expert. À partir de ce résultat de recherche web,
-extrais les informations suivantes au format JSON strict (pas de texte autour, uniquement le JSON) :
+PROMPT_EXTRACT_BATCH = """Tu es un analyste commercial expert spécialisé dans la détection d'opportunités B2B.
+Tu travailles pour CapVisio, un intégrateur audiovisuel et smart workplace basé à Nantes.
+{capvisio_desc}
 
+Analyse ces résultats de recherche web et extrais les opportunités commerciales.
+Pour CHAQUE résultat qui contient un signal d'achat pertinent, retourne un objet JSON.
+
+Signaux pertinents :
+- Déménagement de siège / nouveaux bureaux → besoin d'équiper les salles
+- Construction / rénovation de bâtiment tertiaire → besoin d'intégration AV
+- Levée de fonds importante (> 2M€) → croissance = nouveaux locaux probables
+- Recrutement massif → besoin d'espace = besoin d'équipement
+
+Résultats de recherche :
+{search_results_batch}
+
+Retourne UNIQUEMENT un JSON valide (pas de texte autour, pas de ```json```) :
+[
+  {{
+    "relevant": true,
+    "company_name": "Nom de l'entreprise",
+    "signal_type": "demenagement|construction|renovation|levee_fonds|recrutement",
+    "location": "Ville, Département",
+    "project_details": "Description courte du projet (2-3 phrases max)",
+    "estimated_date": "YYYY-MM ou inconnu",
+    "source_url": "URL de la source",
+    "source_title": "Titre de l'article",
+    "confidence": 0.0-1.0
+  }}
+]
+
+Si aucun résultat n'est pertinent, retourne : []
+"""
+
+PROMPT_SCORE_BATCH = """Tu es un directeur commercial chez CapVisio, intégrateur audiovisuel et smart workplace.
+
+Contexte CapVisio :
+{capvisio_desc}
+- Projets typiques : 50K-500K€ (salles de réunion, auditoriums, espaces collaboratifs)
+- Partenaires tech : Cisco, Microsoft, Barco, Q-SYS, Samsung
+
+Évalue ces prospects :
+{prospects_batch}
+
+Pour CHAQUE prospect, retourne UNIQUEMENT un JSON valide :
+[
+  {{
+    "company_name": "reprendre le nom exact",
+    "score": <int 0-100>,
+    "score_breakdown": {{
+      "pertinence_metier": <0-30>,
+      "taille_deal": <0-20>,
+      "urgence_timing": <0-25>,
+      "proximite_geo": <0-15>,
+      "qualite_signal": <0-10>
+    }},
+    "deal_estimate_keur": "<estimation ex: 50-150>",
+    "approach_angle": "<angle commercial recommandé en 2 phrases>",
+    "priority": "hot|warm|cold"
+  }}
+]
+
+Seuils : hot > 70, warm 40-70, cold < 40
+"""
+
+PROMPT_MESSAGE = """Tu es un commercial senior chez CapVisio, expert en approche B2B.
+{capvisio_desc}
+
+Rédige un message d'approche pour ce prospect. Tu dois :
+1. Mentionner naturellement le signal détecté (SANS dire que tu utilises un outil de veille)
+2. Positionner CapVisio comme expert en espaces de travail connectés
+3. Proposer un audit gratuit des espaces ou un échange rapide de 15 min
+4. Ton : professionnel, direct, humain. Pas corporate ni froid.
+
+Prospect :
+- Entreprise : {company_name}
+- Signal : {signal_type} — {project_details}
+- Localisation : {location}
+- Angle recommandé : {approach_angle}
+- Deal estimé : {deal_estimate}
+
+Retourne UNIQUEMENT un JSON valide :
 {{
-  "relevant": true,
-  "company_name": "nom de l'entreprise",
-  "signal_type": "demenagement" | "construction" | "renovation" | "levee_fonds" | "recrutement",
-  "location": "ville/département",
-  "project_details": "description courte du projet (1-2 phrases)",
-  "estimated_date": "YYYY-MM ou inconnu",
-  "source_url": "URL de la source",
-  "confidence": 0.0-1.0
+  "email_subject": "Objet de l'email (court, accrocheur)",
+  "email_body": "Corps de l'email (max 150 mots, avec signature 'Prénom Nom — CapVisio')",
+  "whatsapp_message": "Message WhatsApp court et direct (max 80 mots)"
 }}
 
-Si le résultat ne contient pas de signal d'achat pertinent pour un intégrateur
-audiovisuel/smart building, retourne uniquement : {{"relevant": false}}
-
-Résultat de recherche :
-{search_result}"""
-
-PROMPT_SCORE = """Tu es un commercial expert chez CapVisio, intégrateur audiovisuel et smart workplace.
-{capvisio_desc}
-
-Évalue ce prospect pour CapVisio :
-{prospect_data}
-
-Score sur 100 selon :
-- Pertinence métier CapVisio (besoin de salles de réunion, visio, AV ?) : /30
-- Taille du deal potentiel : /20
-- Urgence/timing : /25
-- Accessibilité géographique (CapVisio = Nantes, IDF, Bretagne + réseau AUVNI national) : /15
-- Qualité du signal (source fiable, info récente) : /10
-
-Retourne UNIQUEMENT un JSON strict :
-{{
-  "score": <int 0-100>,
-  "score_breakdown": {{"pertinence": 0, "deal_size": 0, "urgence": 0, "geo": 0, "signal_quality": 0}},
-  "deal_estimate": "<estimation en K€>",
-  "approach_angle": "<angle commercial recommandé en 2 phrases>",
-  "priority": "hot" | "warm" | "cold"
-}}"""
-
-PROMPT_MESSAGE = """Tu es un commercial CapVisio. Rédige un message d'approche court et percutant
-pour ce prospect. Le message doit :
-- Mentionner le signal détecté (sans dire qu'on l'a trouvé via un outil automatisé)
-- Positionner CapVisio comme expert en espaces de travail connectés
-- Proposer un audit gratuit / échange rapide
-- Ton : professionnel mais pas corporate, direct
-- Max 150 mots par version
-
-Contexte prospect :
-{prospect_data}
-
-{capvisio_desc}
-
-Retourne UNIQUEMENT un JSON strict :
-{{
-  "email_subject": "objet de l'email",
-  "email_body": "corps de l'email",
-  "whatsapp_message": "message WhatsApp court"
-}}"""
+IMPORTANT : Le message doit sembler écrit par un humain, pas par une IA.
+Le commercial ne dit JAMAIS qu'il a "vu un article" ou "détecté un signal".
+Il dit plutôt "j'ai appris que", "félicitations pour", "je vois que vous êtes en pleine croissance".
+"""
 
 # --- UI ---
 THEME = {

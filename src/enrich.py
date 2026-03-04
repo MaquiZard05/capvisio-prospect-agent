@@ -1,11 +1,11 @@
-"""Enrichissement des données entreprise via Pappers API ou fallback LLM."""
+"""Enrichissement des données entreprise via Pappers API ou fallback LLM Gemini."""
 
 import json
 import requests
-from groq import Groq
-from src.config import GROQ_API_KEY, PAPPERS_API_KEY, LLM_MODEL, LLM_TEMPERATURE, LLM_MAX_TOKENS
+from google import genai
+from src.config import GOOGLE_API_KEY, PAPPERS_API_KEY, LLM_MODEL, LLM_TEMPERATURE, LLM_MAX_TOKENS
 
-client = Groq(api_key=GROQ_API_KEY)
+client = genai.Client(api_key=GOOGLE_API_KEY)
 
 PAPPERS_SEARCH_URL = "https://api.pappers.fr/v2/recherche"
 PAPPERS_COMPANY_URL = "https://api.pappers.fr/v2/entreprise"
@@ -70,13 +70,15 @@ Retourne UNIQUEMENT un JSON :
 }}"""
 
     try:
-        response = client.chat.completions.create(
+        response = client.models.generate_content(
             model=LLM_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=LLM_TEMPERATURE,
-            max_tokens=LLM_MAX_TOKENS,
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(
+                temperature=LLM_TEMPERATURE,
+                max_output_tokens=LLM_MAX_TOKENS,
+            ),
         )
-        text = response.choices[0].message.content.strip()
+        text = response.text.strip()
         start = text.find("{")
         end = text.rfind("}") + 1
         if start >= 0 and end > start:
@@ -96,7 +98,6 @@ def enrich_prospect(prospect: dict) -> dict:
     if not company_name:
         return prospect
 
-    # Tente Pappers d'abord, puis fallback LLM
     enrichment = enrich_via_pappers(company_name)
     if enrichment is None:
         context = f"{prospect.get('project_details', '')} - {prospect.get('location', '')}"

@@ -1,248 +1,262 @@
-/* Dark theme CapVisio - Agent Prospecteur */
+/* CapVisio Prospect Agent — Clean White SaaS Theme */
+/* Palette: #FFFFFF, #F7F8FA, #1A1A2E, #0066FF, #00C48C */
+/* Reference: Linear, Notion, Vercel, Stripe */
 
-@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* --- Animations --- */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
+/* ==========================================================================
+   1. STREAMLIT GLOBAL OVERRIDES
+   ========================================================================== */
+
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewBlockContainer"],
+[data-testid="stMain"],
+[data-testid="stMainBlockContainer"],
+[data-testid="stVerticalBlock"],
+[data-testid="stBottom"] {
+    background-color: #FFFFFF !important;
+    color: #1A1A2E !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+[data-testid="stSidebar"],
+[data-testid="stSidebar"] > div,
+[data-testid="stSidebarContent"] {
+    background-color: #F7F8FA !important;
+    color: #1A1A2E !important;
 }
 
-@keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 8px rgba(0, 212, 170, 0.15); }
-    50%      { box-shadow: 0 0 20px rgba(0, 212, 170, 0.3); }
+[data-testid="stSidebar"] [data-testid="stMarkdown"] p,
+[data-testid="stSidebar"] [data-testid="stMarkdown"] span,
+[data-testid="stSidebar"] label {
+    color: #1A1A2E !important;
 }
 
-.stApp {
-    background-color: #0F1117;
-    color: #FFFFFF;
-    font-family: 'Source Sans 3', sans-serif;
+.stMarkdown,
+.stMarkdown p,
+.stMarkdown span,
+.stMarkdown li {
+    color: #1A1A2E !important;
 }
 
-/* Header */
+.stDataFrame {
+    color: #1A1A2E !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+.block-container {
+    padding-top: 2rem !important;
+}
+
+/* ==========================================================================
+   2. HEADER (.main-header)
+   ========================================================================== */
+
 .main-header {
-    background: linear-gradient(135deg, #0F1117 0%, #1A1D27 100%);
-    border-bottom: 2px solid #00D4AA;
-    padding: 1.5rem 2rem;
-    margin-bottom: 2rem;
-    border-radius: 0 0 12px 12px;
-    animation: fadeIn 0.6s ease;
+    background-color: #FFFFFF;
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #E8ECF1;
 }
 
 .main-header h1 {
-    color: #00D4AA;
+    color: #1A1A2E;
     font-weight: 700;
-    font-size: 2rem;
+    font-size: 28px;
     margin: 0;
+    line-height: 1.3;
 }
 
 .main-header p {
-    color: #8B8FA3;
-    font-size: 1rem;
-    margin: 0.3rem 0 0 0;
-}
-
-/* Cards */
-.prospect-card {
-    background: #1A1D27;
-    border: 1px solid #2D3140;
-    border-radius: 12px;
-    padding: 1.2rem 1.5rem;
-    margin-bottom: 0.8rem;
-    transition: all 0.25s ease;
-    animation: fadeInUp 0.4s ease;
-}
-
-.prospect-card:hover {
-    border-color: #00D4AA;
-    box-shadow: 0 4px 20px rgba(0, 212, 170, 0.1);
-    transform: translateY(-2px);
-}
-
-/* Score badge */
-.score-badge {
-    display: inline-block;
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-weight: 600;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
-}
-
-.score-hot { background: rgba(255, 68, 68, 0.2); color: #FF4444; border: 1px solid #FF4444; }
-.score-warm { background: rgba(255, 165, 0, 0.2); color: #FFA500; border: 1px solid #FFA500; }
-.score-cold { background: rgba(68, 136, 255, 0.2); color: #4488FF; border: 1px solid #4488FF; }
-
-/* Priority badges (inline) */
-.priority-hot {
-    display: inline-block;
-    padding: 0.2rem 0.7rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    background: rgba(255, 75, 75, 0.15);
-    color: #FF4B4B;
-    border: 1px solid rgba(255, 75, 75, 0.4);
-}
-
-.priority-warm {
-    display: inline-block;
-    padding: 0.2rem 0.7rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    background: rgba(255, 165, 0, 0.15);
-    color: #FFA500;
-    border: 1px solid rgba(255, 165, 0, 0.4);
-}
-
-.priority-cold {
-    display: inline-block;
-    padding: 0.2rem 0.7rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    background: rgba(107, 114, 128, 0.15);
     color: #6B7280;
-    border: 1px solid rgba(107, 114, 128, 0.4);
+    font-size: 14px;
+    font-weight: 400;
+    margin: 4px 0 0 0;
 }
 
-/* Signal badges */
-.signal-badge {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
+/* ==========================================================================
+   3. METRIC CARDS (.metric-card)
+   ========================================================================== */
 
-/* Data text */
-.data-text {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    color: #B0B4C8;
-}
-
-/* Metric cards */
 .metric-card {
-    background: linear-gradient(145deg, #1A1D27 0%, #1E2235 100%);
-    border: 1px solid #2D3140;
+    background-color: #F7F8FA;
+    border: 1px solid #E8ECF1;
     border-radius: 12px;
     padding: 1.2rem;
     text-align: center;
-    transition: all 0.25s ease;
-    animation: fadeInUp 0.5s ease;
-}
-
-.metric-card:hover {
-    border-color: rgba(0, 212, 170, 0.4);
-    box-shadow: 0 4px 16px rgba(0, 212, 170, 0.08);
-    transform: translateY(-2px);
 }
 
 .metric-card .value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 2rem;
+    font-size: 32px;
     font-weight: 700;
-    color: #00D4AA;
+    color: #1A1A2E;
+    line-height: 1;
 }
 
 .metric-card .label {
-    color: #8B8FA3;
-    font-size: 0.85rem;
-    margin-top: 0.3rem;
+    color: #6B7280;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 6px;
 }
 
-/* Metric card variants */
-.metric-card.hot .value { color: #FF4B4B; }
-.metric-card.warm .value { color: #FFA500; }
-.metric-card.cold .value { color: #6B7280; }
+.metric-card.hot .value { color: #0066FF; }
+.metric-card.warm .value { color: #F5A623; }
+.metric-card.cold .value { color: #C4C9D4; }
 
-/* --- Message boxes --- */
+/* ==========================================================================
+   4. BUTTONS
+   ========================================================================== */
 
-/* Base message box */
-.message-box {
-    background: #1A1D27;
-    border: 1px solid #2D3140;
+.stButton > button {
+    background-color: #0066FF !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+    padding: 0.55rem 1.4rem !important;
+    box-shadow: none !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+.stButton > button:hover {
+    background-color: #0052CC !important;
+    color: #FFFFFF !important;
+    box-shadow: none !important;
+}
+
+.stButton > button:focus {
+    box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.25) !important;
+}
+
+.stButton > button:active {
+    background-color: #004AB8 !important;
+}
+
+.stDownloadButton > button {
+    background-color: #0066FF !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+.stDownloadButton > button:hover {
+    background-color: #0052CC !important;
+    color: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   5. PROSPECT TABLE / CARDS (.prospect-card)
+   ========================================================================== */
+
+.prospect-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E8ECF1;
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.prospect-card:hover {
+    background-color: #F7F8FA;
+}
+
+/* Dataframe */
+.stDataFrame [data-testid="stDataFrameResizable"] {
+    border: 1px solid #E8ECF1;
     border-radius: 8px;
-    padding: 1rem;
-    font-family: 'Source Sans 3', sans-serif;
-    white-space: pre-wrap;
-    line-height: 1.6;
-    animation: fadeIn 0.4s ease;
+    overflow: hidden;
 }
 
-/* WhatsApp bubble */
-.message-box.whatsapp {
-    background: #075E54;
-    border: none;
-    border-radius: 12px 12px 12px 2px;
-    max-width: 80%;
-    padding: 0.9rem 1.1rem;
-    color: #FFFFFF;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    position: relative;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+.stDataFrame thead tr th {
+    background-color: #F7F8FA !important;
+    color: #6B7280 !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    border-bottom: 1px solid #E8ECF1 !important;
+    padding: 0.6rem 0.8rem !important;
 }
 
-.message-box.whatsapp::before {
-    content: "WhatsApp";
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #25D366;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.4rem;
+.stDataFrame tbody tr {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #E8ECF1;
 }
 
-/* Email styled box */
-.message-box.email {
-    background: #1A1D27;
-    border: none;
-    border-left: 3px solid #00D4AA;
-    border-radius: 0 8px 8px 0;
-    padding: 1rem 1.2rem;
-    color: #E0E0E0;
-    font-size: 0.95rem;
-    line-height: 1.6;
+.stDataFrame tbody tr:hover {
+    background-color: #F7F8FA !important;
 }
 
-.message-box.email::before {
-    content: "Email";
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #00D4AA;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.4rem;
+.stDataFrame tbody tr td {
+    color: #1A1A2E !important;
+    border-bottom: 1px solid #E8ECF1 !important;
 }
 
-/* --- Score breakdown mini bars --- */
+/* ==========================================================================
+   6. SCORE BARS
+   ========================================================================== */
+
+.score-bar,
+.score-bar-container {
+    width: 100%;
+    height: 8px;
+    background-color: #E8ECF1;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.score-fill,
+.score-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background-color: #0066FF;
+}
+
+.score-bar-fill.hot { background-color: #0066FF; }
+.score-bar-fill.warm { background-color: #F5A623; }
+.score-bar-fill.cold { background-color: #C4C9D4; }
+
+/* Breakdown bars (smaller) */
+.breakdown-bar {
+    flex: 1;
+    height: 6px;
+    background-color: #E8ECF1;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.breakdown-fill {
+    height: 100%;
+    border-radius: 4px;
+    background-color: #0066FF;
+}
+
+/* Score breakdown rows */
 .score-breakdown-row {
     display: flex;
     align-items: center;
     margin-bottom: 0.45rem;
-    font-size: 0.85rem;
+    font-size: 13px;
 }
 
 .score-breakdown-row .sb-label {
     width: 120px;
-    color: #8B8FA3;
+    color: #6B7280;
+    font-size: 13px;
     flex-shrink: 0;
 }
 
 .score-breakdown-row .sb-bar-bg {
     flex: 1;
-    height: 8px;
-    background: #2D3140;
+    height: 6px;
+    background-color: #E8ECF1;
     border-radius: 4px;
     overflow: hidden;
     margin: 0 0.6rem;
@@ -250,23 +264,138 @@
 
 .score-breakdown-row .sb-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #00D4AA, #00B894);
     border-radius: 4px;
-    transition: width 0.6s ease;
+    background-color: #0066FF;
 }
 
 .score-breakdown-row .sb-value {
-    font-family: 'JetBrains Mono', monospace;
-    color: #FFFFFF;
+    font-weight: 600;
+    color: #1A1A2E;
     width: 30px;
     text-align: right;
     flex-shrink: 0;
+    font-size: 13px;
 }
 
-/* --- Sidebar stats --- */
+/* ==========================================================================
+   7. PRIORITY BADGES
+   ========================================================================== */
+
+.priority-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.badge-hot,
+.priority-hot {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background-color: #0066FF;
+    color: #FFFFFF;
+}
+
+.badge-warm,
+.priority-warm {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background-color: #F5A623;
+    color: #FFFFFF;
+}
+
+.badge-cold,
+.priority-cold {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background-color: #C4C9D4;
+    color: #6B7280;
+}
+
+/* Score badge (prospect list) */
+.score-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.score-hot {
+    background-color: #0066FF;
+    color: #FFFFFF;
+}
+
+.score-warm {
+    background-color: #F5A623;
+    color: #FFFFFF;
+}
+
+.score-cold {
+    background-color: #C4C9D4;
+    color: #6B7280;
+}
+
+/* ==========================================================================
+   8. SIGNAL TYPE LABELS
+   ========================================================================== */
+
+.signal-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    background-color: #F7F8FA;
+    border: 1px solid #E8ECF1;
+    color: #1A1A2E;
+}
+
+/* ==========================================================================
+   9. SIDEBAR
+   ========================================================================== */
+
+section[data-testid="stSidebar"] {
+    background-color: #F7F8FA !important;
+    border-right: 1px solid #E8ECF1;
+}
+
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] h4 {
+    font-size: 12px !important;
+    text-transform: uppercase;
+    color: #6B7280 !important;
+    letter-spacing: 0.5px;
+    font-weight: 600 !important;
+}
+
+.sidebar-filter-tag {
+    display: inline-block;
+    background-color: #FFFFFF;
+    border: 1px solid #E8ECF1;
+    color: #1A1A2E;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 2px 4px 2px 0;
+}
+
+/* Sidebar stats */
 .sidebar-stats {
-    background: linear-gradient(145deg, #1A1D27 0%, #1E2235 100%);
-    border: 1px solid #2D3140;
+    background-color: #FFFFFF;
+    border: 1px solid #E8ECF1;
     border-radius: 10px;
     padding: 1rem;
     margin-top: 0.5rem;
@@ -280,198 +409,339 @@
 }
 
 .sidebar-stats .stat-row:not(:last-child) {
-    border-bottom: 1px solid #2D314040;
+    border-bottom: 1px solid #E8ECF1;
 }
 
 .sidebar-stats .stat-label {
-    color: #8B8FA3;
-    font-size: 0.85rem;
+    color: #6B7280;
+    font-size: 13px;
 }
 
 .sidebar-stats .stat-value {
-    font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 14px;
+    color: #1A1A2E;
 }
 
-.sidebar-stats .stat-value.hot { color: #FF4B4B; }
-.sidebar-stats .stat-value.warm { color: #FFA500; }
+.sidebar-stats .stat-value.hot { color: #0066FF; }
+.sidebar-stats .stat-value.warm { color: #F5A623; }
 .sidebar-stats .stat-value.cold { color: #6B7280; }
 
-/* Buttons */
-.stButton > button {
-    background: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
-    color: #0F1117;
-    border: none;
-    font-weight: 600;
-    border-radius: 8px;
-    padding: 0.6rem 1.5rem;
-    transition: all 0.25s ease;
-}
-
-.stButton > button:hover {
-    box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
-    transform: translateY(-1px);
-}
-
-/* Download button */
-.stDownloadButton > button {
-    background: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
-    color: #0F1117;
-    border: none;
-    font-weight: 600;
-    border-radius: 8px;
-    transition: all 0.25s ease;
-}
-
-.stDownloadButton > button:hover {
-    box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
-    transform: translateY(-1px);
-}
-
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background-color: #0D0F14;
-    border-right: 1px solid #2D3140;
-}
-
-/* Progress bar */
-.stProgress > div > div {
-    background-color: #00D4AA;
-}
-
-/* Tables / Dataframe */
-.stDataFrame {
-    font-family: 'Source Sans 3', sans-serif;
-}
-
-.stDataFrame [data-testid="stDataFrameResizable"] {
-    border: 1px solid #2D3140;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-/* Dataframe header */
-.stDataFrame thead tr th {
-    background-color: #1A1D27 !important;
-    color: #00D4AA !important;
-    font-weight: 600 !important;
-    border-bottom: 2px solid #00D4AA !important;
-    padding: 0.6rem 0.8rem !important;
-}
-
-/* Dataframe rows */
-.stDataFrame tbody tr {
-    transition: background-color 0.15s ease;
-}
-
-.stDataFrame tbody tr:hover {
-    background-color: rgba(0, 212, 170, 0.05) !important;
-}
-
-/* Expander */
-.streamlit-expanderHeader {
-    background: #1A1D27 !important;
-    border: 1px solid #2D3140;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    font-size: 0.95rem;
-}
-
-.streamlit-expanderHeader:hover {
-    border-color: #00D4AA;
-    background: linear-gradient(135deg, #1A1D27 0%, #1E2235 100%) !important;
-}
+/* ==========================================================================
+   10. EXPANDER / DETAIL CARDS
+   ========================================================================== */
 
 div[data-testid="stExpander"] {
-    border: 1px solid #2D3140;
-    border-radius: 8px;
+    border: 1px solid #E8ECF1;
+    border-radius: 12px;
     overflow: hidden;
     margin-bottom: 0.6rem;
-    animation: fadeInUp 0.4s ease;
-    transition: border-color 0.2s ease;
-}
-
-div[data-testid="stExpander"]:hover {
-    border-color: rgba(0, 212, 170, 0.3);
+    background-color: #FFFFFF;
 }
 
 div[data-testid="stExpander"] details {
-    background: #13151C;
+    background-color: #F7F8FA;
 }
 
 div[data-testid="stExpander"] details summary {
-    background: #1A1D27;
+    background-color: #FFFFFF;
     padding: 0.7rem 1rem;
+    color: #1A1A2E;
+    font-weight: 500;
 }
 
 div[data-testid="stExpander"] details summary:hover {
-    background: linear-gradient(135deg, #1A1D27 0%, #1E2235 100%);
+    background-color: #F7F8FA;
 }
 
-/* Results fade-in */
-.results-container {
-    animation: fadeInUp 0.5s ease;
+.streamlit-expanderHeader {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E8ECF1;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1A1A2E !important;
 }
 
-/* Tabs styling */
-.stTabs [data-baseweb="tab-list"] {
-    gap: 0.5rem;
+.streamlit-expanderHeader:hover {
+    background-color: #F7F8FA !important;
 }
 
-.stTabs [data-baseweb="tab"] {
-    border-radius: 6px 6px 0 0;
-    padding: 0.5rem 1rem;
-    transition: all 0.2s ease;
+/* Detail labels and values */
+.detail-label {
+    color: #6B7280;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-.stTabs [data-baseweb="tab"]:hover {
-    background-color: rgba(0, 212, 170, 0.08);
+.detail-value {
+    color: #1A1A2E;
+    font-size: 14px;
+    font-weight: 500;
 }
 
-.stTabs [aria-selected="true"] {
-    border-bottom-color: #00D4AA !important;
+/* ==========================================================================
+   11. EMAIL MESSAGE
+   ========================================================================== */
+
+.email-message,
+.message-box.email {
+    background-color: #FFFFFF;
+    border: 1px solid #E8ECF1;
+    border-radius: 8px;
+    padding: 16px;
+    color: #1A1A2E;
+    font-size: 14px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    font-family: 'Inter', sans-serif;
 }
 
-/* Score gauge (large circular-like display) */
+.message-box.email::before {
+    content: "Email";
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+/* ==========================================================================
+   12. WHATSAPP MESSAGE
+   ========================================================================== */
+
+.whatsapp-message,
+.whatsapp-bubble,
+.message-box.whatsapp {
+    background-color: #F0FFF8;
+    border-left: 3px solid #00C48C;
+    border-radius: 8px;
+    padding: 14px 16px;
+    color: #1A1A2E;
+    font-size: 14px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    font-family: 'Inter', sans-serif;
+    max-width: 85%;
+}
+
+.message-box.whatsapp::before {
+    content: "WhatsApp";
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #00C48C;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+/* Base message box */
+.message-box {
+    background-color: #FFFFFF;
+    border: 1px solid #E8ECF1;
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: 'Inter', sans-serif;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    color: #1A1A2E;
+}
+
+/* ==========================================================================
+   13. SCORE GAUGE
+   ========================================================================== */
+
 .score-gauge {
     text-align: center;
     padding: 0.5rem 0;
 }
 
 .score-gauge .score-number {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 2.5rem;
+    font-size: 40px;
     font-weight: 700;
     line-height: 1;
+    color: #1A1A2E;
 }
 
-.score-gauge .score-number.hot { color: #FF4B4B; }
-.score-gauge .score-number.warm { color: #FFA500; }
-.score-gauge .score-number.cold { color: #6B7280; }
+.score-gauge .score-number.hot { color: #0066FF; }
+.score-gauge .score-number.warm { color: #F5A623; }
+.score-gauge .score-number.cold { color: #C4C9D4; }
 
 .score-gauge .score-label {
-    color: #8B8FA3;
-    font-size: 0.8rem;
-    margin-top: 0.2rem;
+    color: #6B7280;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 4px;
 }
 
-/* Score progress bar (under the gauge) */
-.score-bar-container {
+.score-gauge-track {
     width: 100%;
-    height: 6px;
-    background: #2D3140;
-    border-radius: 3px;
+    height: 8px;
+    background-color: #E8ECF1;
+    border-radius: 4px;
     overflow: hidden;
-    margin-top: 0.5rem;
+    margin-top: 8px;
 }
 
-.score-bar-fill {
+.score-gauge-fill {
     height: 100%;
-    border-radius: 3px;
-    transition: width 0.8s ease;
+    border-radius: 4px;
+    background-color: #0066FF;
 }
 
-.score-bar-fill.hot { background: linear-gradient(90deg, #FF4B4B, #FF6B6B); }
-.score-bar-fill.warm { background: linear-gradient(90deg, #FFA500, #FFB84D); }
-.score-bar-fill.cold { background: linear-gradient(90deg, #6B7280, #9CA3AF); }
+/* ==========================================================================
+   14. DATA TEXT
+   ========================================================================== */
+
+.data-text {
+    font-size: 13px;
+    color: #6B7280;
+    font-weight: 400;
+}
+
+/* ==========================================================================
+   15. TABS
+   ========================================================================== */
+
+.stTabs [data-baseweb="tab-list"] {
+    gap: 0;
+    border-bottom: 1px solid #E8ECF1;
+}
+
+.stTabs [data-baseweb="tab"] {
+    border-radius: 0;
+    padding: 0.5rem 1rem;
+    color: #6B7280;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    color: #1A1A2E;
+    background-color: #F7F8FA;
+}
+
+.stTabs [aria-selected="true"] {
+    color: #0066FF !important;
+    border-bottom: 2px solid #0066FF !important;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   16. PROGRESS BAR
+   ========================================================================== */
+
+.stProgress > div > div {
+    background-color: #0066FF !important;
+}
+
+/* ==========================================================================
+   17. INPUTS
+   ========================================================================== */
+
+.stSelectbox [data-baseweb="select"],
+.stMultiSelect [data-baseweb="select"],
+.stTextInput input {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E8ECF1 !important;
+    border-radius: 8px !important;
+    color: #1A1A2E !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+.stSelectbox [data-baseweb="select"]:focus-within,
+.stMultiSelect [data-baseweb="select"]:focus-within,
+.stTextInput input:focus {
+    border-color: #0066FF !important;
+    box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.15) !important;
+}
+
+/* ==========================================================================
+   18. RESULTS CONTAINER
+   ========================================================================== */
+
+.results-container {
+    margin-top: 1rem;
+}
+
+/* ==========================================================================
+   19. POSITIVE INDICATORS (green only)
+   ========================================================================== */
+
+.positive-indicator,
+.score-positive {
+    color: #00C48C;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   20. LINKS
+   ========================================================================== */
+
+.stMarkdown a {
+    color: #0066FF !important;
+    text-decoration: none;
+}
+
+.stMarkdown a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   21. DIVIDERS
+   ========================================================================== */
+
+hr,
+.stDivider {
+    border-color: #E8ECF1 !important;
+}
+
+/* ==========================================================================
+   22. STREAMLIT NATIVE METRIC OVERRIDE
+   ========================================================================== */
+
+[data-testid="stMetric"] {
+    background-color: #F7F8FA;
+    border: 1px solid #E8ECF1;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+[data-testid="stMetric"] [data-testid="stMetricValue"] {
+    color: #1A1A2E !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stMetric"] [data-testid="stMetricLabel"] {
+    color: #6B7280 !important;
+}
+
+[data-testid="stMetricDelta"] {
+    color: #00C48C !important;
+}
+
+/* ==========================================================================
+   23. SCROLLBAR
+   ========================================================================== */
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F7F8FA;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #C4C9D4;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6B7280;
+}

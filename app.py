@@ -65,7 +65,7 @@ def load_prospects() -> list[dict]:
 st.markdown(
     """
     <div class="main-header">
-        <h1>🎯 Agent Prospecteur CapVisio</h1>
+        <h1>Agent Prospecteur CapVisio</h1>
         <p>Détection automatique de signaux d'achat — Audiovisuel & Smart Workplace</p>
     </div>
     """,
@@ -125,7 +125,7 @@ with st.sidebar:
             f"""<div class="sidebar-stats">
                 <div class="stat-row">
                     <span class="stat-label">Total prospects</span>
-                    <span class="stat-value" style="color:#00D4AA;">{len(_all)}</span>
+                    <span class="stat-value" style="color:#1A1A2E;">{len(_all)}</span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Hot</span>
@@ -254,9 +254,9 @@ if st.session_state.search_done and st.session_state.prospects:
     with col3:
         hot_count = len([p for p in prospects if p.get("priority") == "hot"])
         st.markdown(
-            f"""<div class="metric-card">
+            f"""<div class="metric-card hot">
                 <div class="value">{hot_count}</div>
-                <div class="label">🔴 Hot leads</div>
+                <div class="label">Hot leads</div>
             </div>""",
             unsafe_allow_html=True,
         )
@@ -276,15 +276,15 @@ if st.session_state.search_done and st.session_state.prospects:
     if filtered:
         st.markdown(f"### 📋 Prospects ({len(filtered)} affichés)")
 
+        _priority_clean = {"hot": "Hot", "warm": "Warm", "cold": "Cold"}
         table_data = []
         for p in filtered:
             signal_info = SIGNAL_LABELS.get(p.get("signal_type", ""), {})
-            priority_info = PRIORITY_LABELS.get(p.get("priority", "cold"), {})
             table_data.append({
                 "Entreprise": p.get("company_name", "Inconnu"),
-                "Signal": f"{signal_info.get('emoji', '')} {signal_info.get('label', p.get('signal_type', ''))}",
+                "Signal": signal_info.get("label", p.get("signal_type", "")),
                 "Score": p.get("score", 0),
-                "Priorité": priority_info.get("label", ""),
+                "Priorité": _priority_clean.get(p.get("priority", "cold"), "Cold"),
                 "Localisation": p.get("location", ""),
                 "Timing": p.get("estimated_date", "Inconnu"),
                 "Deal estimé": p.get("deal_estimate", "N/A"),
@@ -308,14 +308,15 @@ if st.session_state.search_done and st.session_state.prospects:
         # Fiches détaillées
         st.markdown("### 📇 Fiches détaillées")
 
+        _priority_text = {"hot": "Hot", "warm": "Warm", "cold": "Cold"}
         for prospect in filtered:
             signal_info = SIGNAL_LABELS.get(prospect.get("signal_type", ""), {})
-            priority_info = PRIORITY_LABELS.get(prospect.get("priority", "cold"), {})
             score = prospect.get("score", 0)
             company = prospect.get("company_name", "Inconnu")
+            _prio = prospect.get("priority", "cold")
 
             with st.expander(
-                f"{priority_info.get('label', '')} **{company}** — Score: {score}/100 — {signal_info.get('emoji', '')} {signal_info.get('label', '')}"
+                f"[{_priority_text.get(_prio, 'Cold')}] **{company}** — Score: {score}/100 — {signal_info.get('label', '')}"
             ):
                 col_info, col_score = st.columns([2, 1])
 
@@ -337,8 +338,11 @@ if st.session_state.search_done and st.session_state.prospects:
                         if dirigeants:
                             st.markdown(f"**Dirigeants** : {', '.join(dirigeants)}")
 
-                    st.markdown("#### 📡 Signal détecté")
-                    st.markdown(f"**Type** : {signal_info.get('emoji', '')} {signal_info.get('label', '')}")
+                    st.markdown("#### 📡 Signal detecte")
+                    st.markdown(
+                        f'**Type** : <span class="signal-badge">{signal_info.get("label", "")}</span>',
+                        unsafe_allow_html=True,
+                    )
                     st.markdown(f"**Détails** : {prospect.get('project_details', 'N/A')}")
                     st.markdown(f"**Date estimée** : {prospect.get('estimated_date', 'Inconnu')}")
                     if prospect.get("source_url"):
@@ -459,12 +463,12 @@ if st.session_state.search_done and st.session_state.prospects:
 elif not st.session_state.search_done:
     st.markdown(
         """
-        <div style="text-align: center; padding: 4rem 2rem; color: #8B8FA3;">
-            <h2>👆 Configurez vos paramètres et lancez une recherche</h2>
-            <p>L'agent va détecter automatiquement les signaux d'achat<br>
+        <div style="text-align: center; padding: 4rem 2rem; color: #6B7280;">
+            <h2 style="color: #1A1A2E;">Configurez vos parametres et lancez une recherche</h2>
+            <p>L'agent va detecter automatiquement les signaux d'achat<br>
             et qualifier les prospects pour CapVisio.</p>
             <p style="margin-top: 1rem; font-size: 0.9rem;">
-                💡 Ou cliquez sur <b>"Charger résultats précédents"</b> dans la sidebar
+                Ou cliquez sur <b>"Charger resultats precedents"</b> dans la sidebar
             </p>
         </div>
         """,

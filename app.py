@@ -113,6 +113,36 @@ with st.sidebar:
         else:
             st.warning("Aucun résultat sauvegardé")
 
+    # Sidebar stats (after data is loaded)
+    if st.session_state.search_done and st.session_state.prospects:
+        _all = st.session_state.prospects
+        _hot = len([p for p in _all if p.get("priority") == "hot"])
+        _warm = len([p for p in _all if p.get("priority") == "warm"])
+        _cold = len([p for p in _all if p.get("priority") == "cold"])
+        st.markdown("---")
+        st.markdown("### 📈 Statistiques")
+        st.markdown(
+            f"""<div class="sidebar-stats">
+                <div class="stat-row">
+                    <span class="stat-label">Total prospects</span>
+                    <span class="stat-value" style="color:#00D4AA;">{len(_all)}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Hot</span>
+                    <span class="stat-value hot">{_hot}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Warm</span>
+                    <span class="stat-value warm">{_warm}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Cold</span>
+                    <span class="stat-value cold">{_cold}</span>
+                </div>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+
 # --- Bouton recherche ---
 col_search, col_status = st.columns([1, 2])
 
@@ -201,6 +231,7 @@ if st.session_state.search_done and st.session_state.prospects:
         filtered = [p for p in prospects if p.get("priority", "cold") in priority_filter]
 
     # Métriques
+    st.markdown('<div class="results-container">', unsafe_allow_html=True)
     st.markdown("---")
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -314,28 +345,49 @@ if st.session_state.search_done and st.session_state.prospects:
                         st.markdown(f"**Source** : [{prospect['source_url'][:60]}...]({prospect['source_url']})")
 
                 with col_score:
-                    st.markdown("#### 📊 Scoring")
-                    st.metric("Score global", f"{score}/100")
-                    st.progress(score / 100)
+                    priority = prospect.get("priority", "cold")
+                    priority_css = priority if priority in ("hot", "warm", "cold") else "cold"
+                    st.markdown(
+                        f"""<div class="score-gauge">
+                            <div class="score-number {priority_css}">{score}</div>
+                            <div class="score-label">/ 100</div>
+                        </div>
+                        <div class="score-bar-container">
+                            <div class="score-bar-fill {priority_css}" style="width:{score}%"></div>
+                        </div>""",
+                        unsafe_allow_html=True,
+                    )
 
                     breakdown = prospect.get("score_breakdown", {})
                     if breakdown:
+                        label_map = {
+                            "pertinence": ("Pertinence", 30),
+                            "pertinence_metier": ("Pertinence", 30),
+                            "deal_size": ("Taille deal", 20),
+                            "taille_deal": ("Taille deal", 20),
+                            "urgence": ("Urgence", 25),
+                            "urgence_timing": ("Urgence", 25),
+                            "geo": ("Proximite geo", 15),
+                            "proximite_geo": ("Proximite geo", 15),
+                            "signal_quality": ("Qualite signal", 10),
+                            "qualite_signal": ("Qualite signal", 10),
+                        }
+                        bars_html = ""
                         for key, val in breakdown.items():
-                            label_map = {
-                                "pertinence": "Pertinence métier",
-                                "pertinence_metier": "Pertinence métier",
-                                "deal_size": "Taille deal",
-                                "taille_deal": "Taille deal",
-                                "urgence": "Urgence",
-                                "urgence_timing": "Urgence",
-                                "geo": "Proximité géo",
-                                "proximite_geo": "Proximité géo",
-                                "signal_quality": "Qualité signal",
-                                "qualite_signal": "Qualité signal",
-                            }
-                            st.markdown(f"**{label_map.get(key, key)}** : {val}")
+                            lbl, max_val = label_map.get(key, (key, 30))
+                            try:
+                                num_val = int(val)
+                            except (ValueError, TypeError):
+                                num_val = 0
+                            pct = min(100, int(num_val / max(max_val, 1) * 100))
+                            bars_html += f"""<div class="score-breakdown-row">
+                                <span class="sb-label">{lbl}</span>
+                                <div class="sb-bar-bg"><div class="sb-bar-fill" style="width:{pct}%"></div></div>
+                                <span class="sb-value">{num_val}</span>
+                            </div>"""
+                        st.markdown(bars_html, unsafe_allow_html=True)
 
-                    st.markdown(f"**Deal estimé** : {prospect.get('deal_estimate', 'N/A')}")
+                    st.markdown(f"**Deal estime** : {prospect.get('deal_estimate', 'N/A')}")
                     if prospect.get("approach_angle"):
                         st.markdown(f"**Angle** : {prospect.get('approach_angle')}")
 
@@ -352,7 +404,7 @@ if st.session_state.search_done and st.session_state.prospects:
                             st.markdown(f"**Objet** : {messages['email_subject']}")
                         if messages.get("email_body"):
                             st.markdown(
-                                f"""<div class="message-box">{messages['email_body']}</div>""",
+                                f"""<div class="message-box email">{messages['email_body']}</div>""",
                                 unsafe_allow_html=True,
                             )
                             st.code(
@@ -401,6 +453,8 @@ if st.session_state.search_done and st.session_state.prospects:
         )
     else:
         st.info("Aucun prospect ne correspond aux filtres sélectionnés.")
+
+    st.markdown('</div>', unsafe_allow_html=True)  # close results-container
 
 elif not st.session_state.search_done:
     st.markdown(

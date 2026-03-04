@@ -14,6 +14,7 @@ client = genai.Client(api_key=GOOGLE_API_KEY)
 def _call_llm(prompt: str, max_retries: int = 2) -> str:
     for attempt in range(max_retries + 1):
         try:
+            print(f"   [MESSAGE] Appel LLM ({MODEL_MESSAGE}), tentative {attempt+1}/{max_retries+1}")
             response = client.models.generate_content(
                 model=MODEL_MESSAGE,
                 contents=prompt,
@@ -22,13 +23,16 @@ def _call_llm(prompt: str, max_retries: int = 2) -> str:
                     max_output_tokens=LLM_MAX_TOKENS,
                 ),
             )
-            return response.text.strip()
+            text = response.text.strip() if response.text else ""
+            print(f"   [MESSAGE] Réponse reçue ({len(text)} chars)")
+            return text
         except Exception as e:
             if "429" in str(e) and attempt < max_retries:
-                print(f"   ⏳ Rate limit — pause 15s (tentative {attempt+1}/{max_retries})")
+                print(f"   [MESSAGE] Rate limit 429 — pause 15s (tentative {attempt+1}/{max_retries})")
                 time.sleep(15)
             else:
-                raise
+                print(f"   [MESSAGE] Erreur LLM: {e}")
+                return ""
     return ""
 
 
@@ -62,10 +66,10 @@ def generate_messages(prospects: list[dict], progress_callback=None) -> list[dic
     if not to_process:
         already = len([p for p in prospects if p.get("_messaged")])
         if already:
-            print(f"   {already} prospects ont déjà des messages, skip.")
+            print(f"   [MESSAGE] {already} prospects ont déjà des messages, skip.")
         return prospects
 
-    print(f"   {len(to_process)} messages à générer")
+    print(f"   [MESSAGE] {len(to_process)} messages à générer")
 
     for i, prospect in enumerate(to_process):
         if progress_callback:
@@ -82,6 +86,7 @@ def generate_messages(prospects: list[dict], progress_callback=None) -> list[dic
         )
 
         try:
+            print(f"   [MESSAGE] Génération {i+1}/{len(to_process)}: {prospect.get('company_name', '?')}")
             response = _call_llm(prompt)
             messages = _parse_message_json(response)
             if messages:
@@ -90,16 +95,20 @@ def generate_messages(prospects: list[dict], progress_callback=None) -> list[dic
                     "email_body": messages.get("email_body", ""),
                     "whatsapp": messages.get("whatsapp_message", messages.get("whatsapp", "")),
                 }
+                print(f"   [MESSAGE] OK pour {prospect.get('company_name', '?')}")
             else:
+                print(f"   [MESSAGE] Parsing JSON échoué pour {prospect.get('company_name', '?')}")
                 prospect["messages"] = {"email_subject": "", "email_body": "", "whatsapp": ""}
-        except Exception:
+        except Exception as e:
+            print(f"   [MESSAGE] Erreur pour {prospect.get('company_name', '?')}: {e}")
             prospect["messages"] = {"email_subject": "", "email_body": "", "whatsapp": ""}
 
         prospect["_messaged"] = True
 
         # Pause entre les appels
         if i < len(to_process) - 1:
-            print(f"   ⏳ Pause {LLM_SLEEP}s (rate limit)...")
+            print(f"   [MESSAGE] Pause {LLM_SLEEP}s (rate limit)...")
             time.sleep(LLM_SLEEP)
 
+    print(f"   [MESSAGE] Terminé: {len(to_process)} messages générés")
     return prospects

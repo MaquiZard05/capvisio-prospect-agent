@@ -19,6 +19,7 @@ def _call_llm(prompt: str, max_retries: int = 2) -> str:
     global _active_model
     for attempt in range(max_retries + 1):
         try:
+            print(f"   [EXTRACT] Appel LLM ({_active_model}), tentative {attempt+1}/{max_retries+1}")
             response = client.models.generate_content(
                 model=_active_model,
                 contents=prompt,
@@ -27,22 +28,26 @@ def _call_llm(prompt: str, max_retries: int = 2) -> str:
                     max_output_tokens=LLM_MAX_TOKENS,
                 ),
             )
-            return response.text.strip()
+            text = response.text.strip() if response.text else ""
+            print(f"   [EXTRACT] Réponse reçue ({len(text)} chars)")
+            return text
         except Exception as e:
             error_str = str(e)
             if "429" in error_str:
                 # Si quota journalier épuisé, basculer sur le fallback
                 if "PerDay" in error_str and _active_model != MODEL_EXTRACT_FALLBACK:
-                    print(f"   ⚠️ Quota jour épuisé pour {_active_model}, bascule → {MODEL_EXTRACT_FALLBACK}")
+                    print(f"   [EXTRACT] Quota jour épuisé pour {_active_model}, bascule → {MODEL_EXTRACT_FALLBACK}")
                     _active_model = MODEL_EXTRACT_FALLBACK
                     continue
                 if attempt < max_retries:
-                    print(f"   ⏳ Rate limit — pause 15s (tentative {attempt+1}/{max_retries})")
+                    print(f"   [EXTRACT] Rate limit 429 — pause 15s (tentative {attempt+1}/{max_retries})")
                     time.sleep(15)
                 else:
-                    raise
+                    print(f"   [EXTRACT] Rate limit 429 épuisé après {max_retries+1} tentatives")
+                    return ""
             else:
-                raise
+                print(f"   [EXTRACT] Erreur LLM non-429: {e}")
+                return ""
     return ""
 
 
@@ -116,7 +121,7 @@ def extract_prospects(
 
     # Pré-filtrage du bruit
     filtered_results = [r for r in search_results if _pre_filter(r)]
-    print(f"   Pré-filtre : {len(search_results)} → {len(filtered_results)} résultats pertinents")
+    print(f"   [EXTRACT] Pré-filtre : {len(search_results)} → {len(filtered_results)} résultats pertinents")
 
     if not filtered_results:
         return list(existing_prospects or [])
@@ -146,10 +151,15 @@ def extract_prospects(
         )
 
         try:
+            print(f"   [EXTRACT] Batch {batch_idx+1}/{total_batches} — {len(batch)} résultats")
             response = _call_llm(prompt)
             extracted = _parse_json(response)
+            if extracted:
+                print(f"   [EXTRACT] Batch {batch_idx+1}: {len(extracted)} items extraits")
+            else:
+                print(f"   [EXTRACT] Batch {batch_idx+1}: parsing JSON échoué ou vide")
         except Exception as e:
-            print(f"   ⚠️ Erreur batch {batch_idx+1}: {e}")
+            print(f"   [EXTRACT] Erreur batch {batch_idx+1}: {e}")
             extracted = None
 
         if extracted and isinstance(extracted, list):
@@ -172,7 +182,8 @@ def extract_prospects(
 
         # Pause entre les batches
         if batch_idx < total_batches - 1:
-            print(f"   ⏳ Pause {LLM_SLEEP}s (rate limit)...")
+            print(f"   [EXTRACT] Pause {LLM_SLEEP}s (rate limit)...")
             time.sleep(LLM_SLEEP)
 
+    print(f"   [EXTRACT] Terminé: {len(prospects)} prospects au total")
     return prospects

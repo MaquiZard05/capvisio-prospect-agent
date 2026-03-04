@@ -14,6 +14,7 @@ client = genai.Client(api_key=GOOGLE_API_KEY)
 def _call_llm(prompt: str, max_retries: int = 2) -> str:
     for attempt in range(max_retries + 1):
         try:
+            print(f"   [SCORE] Appel LLM ({MODEL_SCORE}), tentative {attempt+1}/{max_retries+1}")
             response = client.models.generate_content(
                 model=MODEL_SCORE,
                 contents=prompt,
@@ -22,13 +23,16 @@ def _call_llm(prompt: str, max_retries: int = 2) -> str:
                     max_output_tokens=LLM_MAX_TOKENS,
                 ),
             )
-            return response.text.strip()
+            text = response.text.strip() if response.text else ""
+            print(f"   [SCORE] Réponse reçue ({len(text)} chars)")
+            return text
         except Exception as e:
             if "429" in str(e) and attempt < max_retries:
-                print(f"   ⏳ Rate limit — pause 15s (tentative {attempt+1}/{max_retries})")
+                print(f"   [SCORE] Rate limit 429 — pause 15s (tentative {attempt+1}/{max_retries})")
                 time.sleep(15)
             else:
-                raise
+                print(f"   [SCORE] Erreur LLM: {e}")
+                return ""
     return ""
 
 
@@ -69,11 +73,11 @@ def score_prospects(prospects: list[dict], progress_callback=None, batch_size: i
     already_scored = [p for p in prospects if p.get("_scored")]
 
     if not to_score:
-        print("   Tous les prospects sont déjà scorés, skip.")
+        print("   [SCORE] Tous les prospects sont déjà scorés, skip.")
         prospects.sort(key=lambda p: p.get("score", 0), reverse=True)
         return prospects
 
-    print(f"   {len(to_score)} à scorer, {len(already_scored)} déjà traités")
+    print(f"   [SCORE] {len(to_score)} à scorer, {len(already_scored)} déjà traités")
 
     total_batches = max(1, (len(to_score) + batch_size - 1) // batch_size)
 
@@ -98,10 +102,15 @@ def score_prospects(prospects: list[dict], progress_callback=None, batch_size: i
         )
 
         try:
+            print(f"   [SCORE] Batch {batch_idx+1}/{total_batches} — {len(batch)} prospects")
             response = _call_llm(prompt)
             scored_list = _parse_json(response)
+            if scored_list:
+                print(f"   [SCORE] Batch {batch_idx+1}: {len(scored_list)} scores reçus")
+            else:
+                print(f"   [SCORE] Batch {batch_idx+1}: parsing JSON échoué ou vide")
         except Exception as e:
-            print(f"   ⚠️ Erreur scoring batch {batch_idx+1}: {e}")
+            print(f"   [SCORE] Erreur scoring batch {batch_idx+1}: {e}")
             scored_list = None
 
         if scored_list:
@@ -135,8 +144,9 @@ def score_prospects(prospects: list[dict], progress_callback=None, batch_size: i
 
         # Pause entre les batches
         if batch_idx < total_batches - 1:
-            print(f"   ⏳ Pause {LLM_SLEEP}s (rate limit)...")
+            print(f"   [SCORE] Pause {LLM_SLEEP}s (rate limit)...")
             time.sleep(LLM_SLEEP)
 
+    print(f"   [SCORE] Terminé: {len(prospects)} prospects scorés")
     prospects.sort(key=lambda p: p.get("score", 0), reverse=True)
     return prospects

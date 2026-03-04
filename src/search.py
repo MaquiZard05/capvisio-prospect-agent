@@ -29,6 +29,12 @@ def _search_google_news(query: str, max_results: int = 5) -> list[dict]:
         resp = requests.get(url, timeout=10, headers={
             "User-Agent": "Mozilla/5.0 (compatible; CapVisioBot/1.0)"
         })
+        # Gestion granulaire du 429
+        if resp.status_code == 429:
+            print(f"   [SEARCH] 429 Google News pour: {query} — pause 5s avant fallback DDG")
+            time.sleep(5)
+            return []  # Retourne vide pour déclencher le fallback DDG
+
         resp.raise_for_status()
         feed = feedparser.parse(resp.text)
         results = []
@@ -39,9 +45,23 @@ def _search_google_news(query: str, max_results: int = 5) -> list[dict]:
                 "snippet": _clean_html(entry.get("summary", entry.get("description", ""))),
                 "published": entry.get("published", ""),
             })
+        print(f"   [SEARCH] Google News: '{query}' → {len(results)} résultats")
         return results
+    except requests.exceptions.HTTPError as e:
+        if e.response is not None and e.response.status_code == 429:
+            print(f"   [SEARCH] 429 Google News (HTTPError) pour: {query} — pause 5s avant fallback DDG")
+            time.sleep(5)
+        else:
+            print(f"   [SEARCH] Google News HTTPError: {e}")
+        return []
+    except requests.exceptions.Timeout:
+        print(f"   [SEARCH] Google News timeout pour: {query}")
+        return []
+    except requests.exceptions.ConnectionError:
+        print(f"   [SEARCH] Google News erreur connexion pour: {query}")
+        return []
     except Exception as e:
-        print(f"   ⚠️ Google News échoué: {e}")
+        print(f"   [SEARCH] Google News erreur inattendue: {e}")
         return []
 
 
@@ -51,6 +71,7 @@ def _search_ddg_news(query: str, max_results: int = 5) -> list[dict]:
         from duckduckgo_search import DDGS
         with DDGS() as ddgs:
             results = list(ddgs.news(query, region="fr-fr", max_results=max_results))
+        print(f"   [SEARCH] DDG News fallback: '{query}' → {len(results)} résultats")
         return [
             {
                 "title": r.get("title", ""),
@@ -61,7 +82,7 @@ def _search_ddg_news(query: str, max_results: int = 5) -> list[dict]:
             for r in results
         ]
     except Exception as e:
-        print(f"   ⚠️ DuckDuckGo News échoué: {e}")
+        print(f"   [SEARCH] DuckDuckGo News échoué: {e}")
         return []
 
 
@@ -90,6 +111,8 @@ def search_signals(
     all_results = []
     seen_urls = set()
 
+    print(f"   [SEARCH] Lancement de {len(queries)} requêtes")
+
     for i, q in enumerate(queries):
         if progress_callback:
             progress_callback(i, len(queries), q["query"])
@@ -99,6 +122,7 @@ def search_signals(
 
         # Fallback DuckDuckGo News si Google News ne retourne rien
         if not results:
+            print(f"   [SEARCH] Fallback DDG pour: {q['query']}")
             results = _search_ddg_news(q["query"], max_results=max_results_per_query)
 
         for r in results:
@@ -119,4 +143,5 @@ def search_signals(
         # Pause entre requêtes
         time.sleep(2)
 
+    print(f"   [SEARCH] Total: {len(all_results)} résultats uniques")
     return all_results

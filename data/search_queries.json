@@ -1,35 +1,42 @@
 {
   "demenagement": [
-    "\"nouveau siège\" entreprise {geo} {year}",
-    "\"déménagement\" OR \"nouveaux locaux\" entreprise bureaux {geo}",
+    "\"nouveau siège\" OR \"nouveau siège social\" entreprise {geo} {year}",
+    "\"déménagement\" OR \"nouveaux locaux\" entreprise bureaux {geo} {year}",
     "\"s'installe\" \"nouveaux bureaux\" société {geo} {year}",
-    "\"transfert de siège\" entreprise {geo} {year}",
-    "\"inauguration\" \"nouveaux locaux\" entreprise {geo}"
+    "\"transfert de siège\" OR \"déménage son siège\" entreprise {geo} {year}",
+    "\"inauguration\" \"nouveaux locaux\" OR \"nouveau siège\" entreprise {geo} {year}",
+    "\"emménage\" OR \"prend ses quartiers\" entreprise bureaux {geo} {year}"
   ],
   "construction": [
     "\"immeuble de bureaux\" construction livraison {geo} {year}",
     "\"permis de construire\" bureaux tertiaire {geo} {year}",
-    "\"projet immobilier\" bureaux tertiaire {geo} {year}",
+    "\"projet immobilier\" bureaux tertiaire livraison {geo} {year}",
     "\"campus\" entreprise construction {geo} {year}",
-    "\"parc d'activités\" bureaux {geo} {year}"
+    "\"parc d'activités\" OR \"pôle tertiaire\" bureaux {geo} {year}",
+    "\"pose de première pierre\" OR \"lancement chantier\" bureaux {geo} {year}"
   ],
   "levee_fonds": [
-    "\"levée de fonds\" \"millions\" startup {geo} {year}",
-    "\"lève\" \"millions d'euros\" startup {geo} {year}",
-    "\"série A\" OR \"série B\" startup {geo} {year}",
-    "\"tour de table\" \"millions\" entreprise {geo} {year}",
-    "\"croissance\" \"financement\" startup {geo} {year}"
+    "\"levée de fonds\" \"millions\" startup entreprise {geo} {year}",
+    "\"lève\" \"millions d'euros\" startup scale-up {geo} {year}",
+    "\"série A\" OR \"série B\" OR \"série C\" startup {geo} {year}",
+    "\"tour de table\" \"millions\" entreprise croissance {geo} {year}",
+    "\"croissance\" \"financement\" OR \"investissement\" startup recrutement {geo} {year}",
+    "\"augmentation de capital\" OR \"entrée au capital\" entreprise {geo} {year}"
   ],
   "recrutement": [
     "\"recrute\" \"postes\" OR \"collaborateurs\" entreprise {geo} {year}",
-    "\"plan de recrutement\" entreprise {geo} {year}",
-    "\"créations d'emplois\" OR \"embauches\" entreprise {geo} {year}",
-    "\"forte croissance\" recrutement entreprise {geo} {year}"
+    "\"plan de recrutement\" OR \"plan d'embauche\" entreprise {geo} {year}",
+    "\"créations d'emplois\" OR \"créations de postes\" entreprise {geo} {year}",
+    "\"forte croissance\" recrutement entreprise {geo} {year}",
+    "\"ouverture de bureaux\" recrutement entreprise {geo} {year}",
+    "\"recruter\" \"centaine\" OR \"dizaine\" \"collaborateurs\" {geo} {year}"
   ],
   "renovation": [
     "\"rénovation\" \"bureaux\" OR \"siège\" entreprise {geo} {year}",
-    "\"réaménagement\" \"locaux\" entreprise {geo}",
-    "\"travaux\" \"bureaux\" \"rénovation\" entreprise {geo} {year}",
-    "\"smart building\" OR \"bâtiment intelligent\" {geo} {year}"
+    "\"réaménagement\" OR \"réhabilitation\" \"locaux\" entreprise {geo} {year}",
+    "\"travaux\" \"bureaux\" rénovation modernisation {geo} {year}",
+    "\"smart building\" OR \"bâtiment intelligent\" projet {geo} {year}",
+    "\"flex office\" OR \"espaces collaboratifs\" aménagement entreprise {geo} {year}",
+    "\"transformation digitale\" \"espaces de travail\" OR \"workplace\" {geo} {year}"
   ]
 }

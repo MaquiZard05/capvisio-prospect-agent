@@ -33,38 +33,58 @@ QUERIES_FILE = DATA_DIR / "search_queries.json"
 
 # --- CapVisio ---
 CAPVISIO_DESCRIPTION = (
-    "CapVisio est un intégrateur audiovisuel et smart workplace basé à Nantes. "
-    "CapVisio conçoit et installe des espaces de travail connectés : visioconférence, "
-    "audiovisuel, affichage dynamique, bâtiment intelligent. "
-    "Clients : entreprises tertiaires (bureaux, sièges sociaux). "
-    "Couverture : Grand Ouest (Nantes, Rennes, Bretagne) + IDF + réseau GIE AUVNI national."
+    "CapVisio est le 3ème intégrateur visioconférence en France, spécialisé smart workplace. "
+    "Chiffres clés : 22,3 M€ de CA, 70 collaborateurs, 900+ clients actifs, 7 000+ espaces installés. "
+    "Expertises : visioconférence (Cisco, Microsoft Teams Rooms, Zoom Rooms), audiovisuel professionnel "
+    "(Barco, Q-SYS, Samsung), affichage dynamique, bâtiment intelligent (GTC/GTB). "
+    "Partenaires technologiques : Cisco, Microsoft, Barco, Q-SYS, Samsung, Crestron, Poly. "
+    "Clients : entreprises tertiaires, collectivités, enseignement supérieur (bureaux, sièges sociaux, auditoriums). "
+    "Siège à Nantes, couverture nationale via le réseau GIE AUVNI (20+ intégrateurs partenaires)."
 )
 
 # --- Prompts LLM ---
 PROMPT_EXTRACT_BATCH = """Tu es un analyste commercial expert spécialisé dans la détection d'opportunités B2B.
-Tu travailles pour CapVisio, un intégrateur audiovisuel et smart workplace basé à Nantes.
+Tu travailles pour CapVisio, un intégrateur audiovisuel et smart workplace.
 {capvisio_desc}
 
-Analyse ces résultats de recherche web et extrais les opportunités commerciales.
-Pour CHAQUE résultat qui contient un signal d'achat pertinent, retourne un objet JSON.
+MISSION : Analyse les résultats de recherche ci-dessous et extrais UNIQUEMENT les opportunités commerciales réelles et exploitables.
 
-Signaux pertinents :
-- Déménagement de siège / nouveaux bureaux → besoin d'équiper les salles
-- Construction / rénovation de bâtiment tertiaire → besoin d'intégration AV
-- Levée de fonds importante (> 2M€) → croissance = nouveaux locaux probables
-- Recrutement massif → besoin d'espace = besoin d'équipement
+RÈGLES STRICTES DE FILTRAGE :
+1. CHAQUE opportunité DOIT avoir un NOM D'ENTREPRISE PRÉCIS et IDENTIFIABLE (raison sociale réelle).
+   → REJETER : "une entreprise nantaise", "une startup", "un promoteur", "entreprise inconnue", noms génériques.
+2. CHAQUE opportunité DOIT contenir un SIGNAL D'ACHAT CONCRET avec des détails vérifiables (adresse, montant, date, nombre de postes...).
+   → REJETER : articles d'opinion, tendances générales, études de marché, listes sans projet précis.
+3. Le signal doit concerner une entreprise qui POURRAIT AVOIR BESOIN d'équipements audiovisuels ou smart workplace.
+   → REJETER : commerce de détail, restaurants, logements résidentiels, agriculture.
+
+SIGNAUX PERTINENTS (par ordre de priorité) :
+- DÉMÉNAGEMENT : entreprise qui déménage son siège ou ouvre de nouveaux bureaux → doit équiper les salles de réunion
+- CONSTRUCTION : nouveau bâtiment tertiaire, campus, immeuble de bureaux → intégration AV dès la conception
+- RÉNOVATION : réaménagement de bureaux existants, passage en flex office → modernisation des équipements
+- LEVÉE DE FONDS : levée > 2M€ avec plan de croissance → nouveaux locaux probables sous 6-18 mois
+- RECRUTEMENT : plan de recrutement > 20 postes → besoin d'espace supplémentaire = besoin d'équipement
+
+EXEMPLES DE CE QUI EST PERTINENT :
+✅ "Sodexo déménage son siège social à Nanterre dans un immeuble de 15 000 m²" → signal clair, entreprise nommée
+✅ "Doctolib lève 500M€ et prévoit 1 000 recrutements" → croissance = nouveaux bureaux
+✅ "Bouygues Immobilier lance la construction d'un campus tertiaire de 30 000 m² à Rennes" → projet concret
+
+EXEMPLES DE CE QUI N'EST PAS PERTINENT :
+❌ "Le marché de l'immobilier de bureau progresse en 2026" → pas d'entreprise précise
+❌ "Une startup nantaise lève des fonds" → nom d'entreprise manquant
+❌ "Inauguration d'un centre commercial à Nantes" → commerce de détail, pas de besoin AV
 
 Résultats de recherche :
 {search_results_batch}
 
-Retourne UNIQUEMENT un JSON valide (pas de texte autour, pas de ```json```) :
+Retourne UNIQUEMENT un JSON valide (pas de texte autour, pas de ```json```, pas de commentaires) :
 [
   {{
     "relevant": true,
-    "company_name": "Nom de l'entreprise",
+    "company_name": "Nom exact de l'entreprise (raison sociale)",
     "signal_type": "demenagement|construction|renovation|levee_fonds|recrutement",
     "location": "Ville, Département",
-    "project_details": "Description courte du projet (2-3 phrases max)",
+    "project_details": "Description factuelle du projet en 2-3 phrases avec chiffres si disponibles",
     "estimated_date": "YYYY-MM ou inconnu",
     "source_url": "URL de la source",
     "source_title": "Titre de l'article",
@@ -72,20 +92,59 @@ Retourne UNIQUEMENT un JSON valide (pas de texte autour, pas de ```json```) :
   }}
 ]
 
-Si aucun résultat n'est pertinent, retourne : []
+RAPPEL : Ne retourne QUE des entreprises avec un nom précis et un signal concret. En cas de doute, NE PAS inclure. Si aucun résultat n'est pertinent, retourne : []
 """
 
 PROMPT_SCORE_BATCH = """Tu es un directeur commercial chez CapVisio, intégrateur audiovisuel et smart workplace.
 
 Contexte CapVisio :
 {capvisio_desc}
-- Projets typiques : 50K-500K€ (salles de réunion, auditoriums, espaces collaboratifs)
-- Partenaires tech : Cisco, Microsoft, Barco, Q-SYS, Samsung
+
+Offre et projets typiques :
+- Salle de réunion équipée (visio + écran + son) : 15K-50K€
+- Salle de direction / boardroom : 50K-150K€
+- Auditorium / amphithéâtre : 100K-500K€
+- Équipement complet d'un étage (5-10 salles) : 100K-300K€
+- Smart building (GTC, affichage dynamique, sonorisation) : 200K-1M€
+
+Partenaires technologiques (bonus si le prospect utilise déjà ces marques) :
+- Visioconférence : Cisco Webex, Microsoft Teams Rooms, Zoom Rooms, Poly
+- Affichage : Samsung, Barco ClickShare, LG
+- Audio/pilotage : Q-SYS, Crestron, Shure, Biamp
+- Collaboration : Microsoft 365, Google Workspace
+
+GRILLE DE SCORING (total sur 100) :
+
+1. PERTINENCE MÉTIER (0-30 pts) :
+   - 25-30 : Besoin AV explicite (salle de réunion, visioconférence, auditorium, smart building)
+   - 15-24 : Besoin AV probable (nouveaux bureaux tertiaires, siège social, campus)
+   - 5-14 : Besoin AV possible (croissance, levée de fonds sans mention de locaux)
+   - 0-4 : Peu de lien avec l'AV (retail, logistique pure, industrie lourde)
+
+2. TAILLE DU DEAL (0-20 pts) :
+   - 15-20 : Projet > 200K€ potentiel (campus, siège social, bâtiment neuf entier)
+   - 8-14 : Projet 50K-200K€ (quelques salles, un étage, rénovation partielle)
+   - 0-7 : Projet < 50K€ (1-2 salles, petit bureau)
+
+3. URGENCE / TIMING (0-25 pts) :
+   - 20-25 : Projet en cours ou livraison < 6 mois, décision imminente
+   - 10-19 : Projet annoncé, livraison 6-18 mois
+   - 0-9 : Projet lointain (> 18 mois) ou date inconnue
+
+4. PROXIMITÉ GÉOGRAPHIQUE (0-15 pts) :
+   - 12-15 : Grand Ouest (Nantes, Rennes, Angers, Brest) = zone directe CapVisio
+   - 7-11 : Île-de-France ou grandes métropoles couvertes via GIE AUVNI
+   - 0-6 : Autres régions (couverture possible via AUVNI mais moins directe)
+
+5. QUALITÉ DU SIGNAL (0-10 pts) :
+   - 8-10 : Source fiable (presse éco, communiqué officiel), détails concrets
+   - 4-7 : Source correcte mais peu de détails
+   - 0-3 : Source faible ou information vague
 
 Évalue ces prospects :
 {prospects_batch}
 
-Pour CHAQUE prospect, retourne UNIQUEMENT un JSON valide :
+Pour CHAQUE prospect, retourne UNIQUEMENT un JSON valide (pas de texte autour, pas de ```json```) :
 [
   {{
     "company_name": "reprendre le nom exact",
@@ -103,17 +162,32 @@ Pour CHAQUE prospect, retourne UNIQUEMENT un JSON valide :
   }}
 ]
 
-Seuils : hot > 70, warm 40-70, cold < 40
+Seuils STRICTS : hot > 70, warm 40-70, cold < 40. Sois exigeant : un prospect "hot" doit vraiment représenter une opportunité imminente et qualifiée.
 """
 
-PROMPT_MESSAGE = """Tu es un commercial senior chez CapVisio, expert en approche B2B.
+PROMPT_MESSAGE = """Tu es un commercial senior chez CapVisio, expert en approche B2B personnalisée.
 {capvisio_desc}
 
-Rédige un message d'approche pour ce prospect. Tu dois :
-1. Mentionner naturellement le signal détecté (SANS dire que tu utilises un outil de veille)
-2. Positionner CapVisio comme expert en espaces de travail connectés
-3. Proposer un audit gratuit des espaces ou un échange rapide de 15 min
-4. Ton : professionnel, direct, humain. Pas corporate ni froid.
+MISSION : Rédige un message d'approche CRÉDIBLE et ENVOYABLE pour ce prospect.
+
+RÈGLES ABSOLUES — Le commercial :
+- Dit : "j'ai appris que", "félicitations pour", "je vois que", "en échangeant avec des acteurs de votre secteur"
+- Ne dit JAMAIS : "j'ai vu un article", "notre outil de veille", "selon nos informations", "nous avons détecté", "d'après notre analyse"
+- Vouvoie toujours dans l'email
+- Ne tutoie PAS dans le WhatsApp non plus (vouvoiement partout)
+- Ne commence JAMAIS un email par "Cher" ou "Chère" → utiliser "Bonjour," tout court
+- Ne termine JAMAIS par "Cordialement" → utiliser "À très vite," ou "Belle journée,"
+
+STRUCTURE EMAIL (max 150 mots) :
+1. Accroche : mentionner le signal de façon naturelle (1 phrase)
+2. Valeur : positionner CapVisio comme partenaire pertinent pour ce projet précis (2-3 phrases)
+3. Call-to-action : proposer un audit gratuit des futurs espaces OU un échange de 15 min
+4. Signature : "Prénom Nom — CapVisio, Intégrateur Smart Workplace"
+
+STRUCTURE WHATSAPP (max 80 mots) :
+1. Accroche directe liée au signal (1 phrase)
+2. Proposition de valeur courte (1 phrase)
+3. Call-to-action simple : "Un café pour en discuter ?" ou "15 min pour vous montrer ce qu'on fait ?"
 
 Prospect :
 - Entreprise : {company_name}
@@ -122,16 +196,14 @@ Prospect :
 - Angle recommandé : {approach_angle}
 - Deal estimé : {deal_estimate}
 
-Retourne UNIQUEMENT un JSON valide :
+Retourne UNIQUEMENT un JSON valide (pas de texte autour, pas de ```json```) :
 {{
-  "email_subject": "Objet de l'email (court, accrocheur)",
-  "email_body": "Corps de l'email (max 150 mots, avec signature 'Prénom Nom — CapVisio')",
-  "whatsapp_message": "Message WhatsApp court et direct (max 80 mots)"
+  "email_subject": "Objet de l'email (court, accrocheur, max 8 mots, sans point final)",
+  "email_body": "Corps de l'email (max 150 mots, signature 'Prénom Nom — CapVisio, Intégrateur Smart Workplace')",
+  "whatsapp_message": "Message WhatsApp (max 80 mots, direct, vouvoiement)"
 }}
 
-IMPORTANT : Le message doit sembler écrit par un humain, pas par une IA.
-Le commercial ne dit JAMAIS qu'il a "vu un article" ou "détecté un signal".
-Il dit plutôt "j'ai appris que", "félicitations pour", "je vois que vous êtes en pleine croissance".
+IMPORTANT : Chaque message doit être suffisamment personnalisé pour que le destinataire sente qu'on s'intéresse VRAIMENT à son projet. Pas de template générique.
 """
 
 # --- UI ---

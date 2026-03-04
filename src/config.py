@@ -210,11 +210,13 @@ IMPORTANT : Chaque message doit être suffisamment personnalisé pour que le des
 
 # --- UI ---
 THEME = {
-    "bg_color": "#0F1117",
-    "accent_color": "#00D4AA",
-    "text_color": "#FFFFFF",
-    "card_bg": "#1A1D27",
-    "card_border": "#2D3140",
+    "bg_color": "#FFFFFF",
+    "bg_secondary": "#F7F8FA",
+    "accent_color": "#0066FF",
+    "accent_secondary": "#00C48C",
+    "text_color": "#1A1A2E",
+    "text_secondary": "#6B7280",
+    "border_color": "#E8ECF1",
 }
 
 SIGNAL_LABELS = {
@@ -226,7 +228,7 @@ SIGNAL_LABELS = {
 }
 
 PRIORITY_LABELS = {
-    "hot": {"label": "🔴 Hot", "color": "#FF4444"},
-    "warm": {"label": "🟠 Warm", "color": "#FFA500"},
-    "cold": {"label": "🔵 Cold", "color": "#4488FF"},
+    "hot": {"label": "Hot", "color": "#0066FF"},
+    "warm": {"label": "Warm", "color": "#F5A623"},
+    "cold": {"label": "Cold", "color": "#C4C9D4"},
 }

@@ -3,5 +3,8 @@ __pycache__/
 *.pyc
 .venv/
 venv/
-data/prospects.json
+*.egg-info/
+dist/
+build/
+.DS_Store
 .streamlit/

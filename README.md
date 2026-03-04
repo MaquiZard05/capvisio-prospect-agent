@@ -1,15 +1,14 @@
 # Agent Prospecteur CapVisio
 
-Agent IA de détection automatique de signaux d'achat pour CapVisio (intégrateur audiovisuel & smart workplace).
+Agent IA de détection automatique d'opportunités commerciales pour CapVisio — intégrateur audiovisuel & smart workplace.
 
-## Fonctionnalités
+## Ce que fait l'outil
 
-- Détection de signaux d'achat (permis de construire, déménagements, levées de fonds, recrutements)
-- Extraction structurée via LLM (Groq / Llama 3.1 70B)
-- Enrichissement données entreprise (Pappers API)
-- Scoring et qualification automatique des prospects
-- Génération de messages d'approche personnalisés
-- Dashboard Streamlit interactif avec export CSV
+1. **Détecte** des signaux d'achat sur le web (déménagements, constructions, levées de fonds, rénovations, recrutements)
+2. **Extrait** les prospects via IA (nom, localisation, détails du projet, timeline)
+3. **Score** chaque prospect sur 100 selon sa pertinence pour CapVisio
+4. **Génère** des messages d'approche personnalisés (email + WhatsApp)
+5. **Affiche** tout dans un dashboard interactif avec filtres et export CSV
 
 ## Installation
 
@@ -21,22 +20,55 @@ pip install -r requirements.txt
 
 ## Configuration
 
-Copier `.env` et renseigner les clés API :
+Créer un fichier `.env` à la racine :
+
 ```
-GROQ_API_KEY=your_groq_api_key
-PAPPERS_API_KEY=your_pappers_api_key  # optionnel
+GOOGLE_API_KEY=votre_clé_gemini
+PAPPERS_API_KEY=votre_clé_pappers  # optionnel
 ```
+
+Obtenir une clé Gemini gratuite sur [ai.google.dev](https://ai.google.dev/).
 
 ## Lancement
 
 ```bash
+# Dashboard interactif
 streamlit run app.py
+
+# Pipeline CLI (sans interface)
+python3 run_pipeline.py --signals demenagement,construction --geo Nantes,Paris
 ```
 
-## Stack
+## Stack technique
 
-- Python 3.11+
-- Streamlit (interface)
-- Groq API / Llama 3.1 70B (LLM)
-- DuckDuckGo Search (recherche web)
-- Pappers API (enrichissement entreprise)
+| Composant | Outil |
+|-----------|-------|
+| Langage | Python 3.11+ |
+| LLM | Google Gemini 2.5 Flash / Flash-Lite |
+| Recherche web | Google News RSS + DuckDuckGo News (fallback) |
+| Enrichissement | Pappers API (optionnel) |
+| Interface | Streamlit |
+| Stockage | JSON local |
+
+## Structure
+
+```
+├── app.py                 # Dashboard Streamlit
+├── run_pipeline.py        # Pipeline CLI
+├── src/
+│   ├── config.py          # Configuration + prompts LLM
+│   ├── search.py          # Recherche web (Google News RSS)
+│   ├── extract.py         # Extraction structurée (Gemini)
+│   ├── enrich.py          # Enrichissement entreprise (Pappers)
+│   ├── score.py           # Scoring & qualification
+│   └── message.py         # Génération messages d'approche
+├── data/
+│   ├── prospects.json     # Cache des résultats
+│   └── search_queries.json # Templates de requêtes
+└── styles/
+    └── main.css           # Thème UI
+```
+
+## Licence
+
+Projet privé — tous droits réservés.

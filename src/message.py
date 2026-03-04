@@ -8,14 +8,20 @@ from src.config import (
     CAPVISIO_DESCRIPTION, PROMPT_MESSAGE,
 )
 
-client = genai.Client(api_key=GOOGLE_API_KEY)
+client = None
+
+def _get_client():
+    global client
+    if client is None:
+        client = genai.Client(api_key=GOOGLE_API_KEY)
+    return client
 
 
 def _call_llm(prompt: str, max_retries: int = 2) -> str:
     for attempt in range(max_retries + 1):
         try:
             print(f"   [MESSAGE] Appel LLM ({MODEL_MESSAGE}), tentative {attempt+1}/{max_retries+1}")
-            response = client.models.generate_content(
+            response = _get_client().models.generate_content(
                 model=MODEL_MESSAGE,
                 contents=prompt,
                 config=genai.types.GenerateContentConfig(

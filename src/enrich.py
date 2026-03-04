@@ -6,7 +6,13 @@ import requests
 from google import genai
 from src.config import GOOGLE_API_KEY, PAPPERS_API_KEY, MODEL_SCORE, LLM_MAX_TOKENS, LLM_SLEEP
 
-client = genai.Client(api_key=GOOGLE_API_KEY)
+client = None
+
+def _get_client():
+    global client
+    if client is None:
+        client = genai.Client(api_key=GOOGLE_API_KEY)
+    return client
 
 PAPPERS_SEARCH_URL = "https://api.pappers.fr/v2/recherche"
 PAPPERS_COMPANY_URL = "https://api.pappers.fr/v2/entreprise"
@@ -76,7 +82,7 @@ Retourne UNIQUEMENT un JSON :
 
     try:
         print(f"   [ENRICH] LLM fallback pour '{company_name}'")
-        response = client.models.generate_content(
+        response = _get_client().models.generate_content(
             model=MODEL_SCORE,
             contents=prompt,
             config=genai.types.GenerateContentConfig(
